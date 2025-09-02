@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>2025年就活ブログ｜新卒面接対策・SPI攻略・GD完全ガイド</title>
+    <description>2025年新卒就活に役立つ最新情報を配信。オンライン面接対策、SPI攻略法、グループディスカッション対策など、内定獲得に直結する実践的なアドバイスを提供。</description>
+    <link>https://your-domain.com/blog</link>
+    <atom:link href="https://your-domain.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
+    <language>ja-JP</language>
+    <lastBuildDate>2025-08-23T00:00:00+09:00</lastBuildDate>
+    <pubDate>2025-08-23T00:00:00+09:00</pubDate>
+    
+    <item>
+      <title>【2025年最新】オンライン面接で必ず聞かれるTopics 7選｜新卒就活生必見の面接対策</title>
+      <description>2025年新卒就活では、オンライン面接が標準になりました。企業の75%以上が「ハイブリッド採用」を導入し、オンラインと対面を使い分ける時代に。必ず聞かれる面接Topicsを7つ厳選して解説します。</description>
+      <link>https://your-domain.com/blog/2025-online-interview-topics</link>
+      <guid>https://your-domain.com/blog/2025-online-interview-topics</guid>
+      <pubDate>2025-08-23T00:00:00+09:00</pubDate>
+      <category>面接対策</category>
+      <category>オンライン面接</category>
+      <category>2025年就活</category>
+    </item>
+    
+    <item>
+      <title>【2025年完全版】SPI攻略Topics｜就活生が1ヶ月でマスターする勉強法</title>
+      <description>2025年新卒採用でSPIは依然として最重要課題。企業の85%以上が導入しており、合格ラインは平均65%。1ヶ月で確実に突破するSPI攻略Topicsを徹底解説。</description>
+      <link>https://your-domain.com/blog/spi-master-topics</link>
+      <guid>https://your-domain.com/blog/spi-master-topics</guid>
+      <pubDate>2025-08-23T00:00:00+09:00</pubDate>
+      <category>適性検査</category>
+      <category>SPI攻略</category>
+      <category>2025年就活</category>
+    </item>
+    
+    <item>
+      <title>【2025年完全ガイド】グループディスカッションで内定をもらうTopics 10選</title>
+      <description>2025年新卒就活でグループディスカッションは重要な選考ステップ。GDで合格する確率はわずか25%。内定者が実践しているGD攻略Topicsを10選ご紹介。</description>
+      <link>https://your-domain.com/blog/group-discussion-topics</link>
+      <guid>https://your-domain.com/blog/group-discussion-topics</guid>
+      <pubDate>2025-08-23T00:00:00+09:00</pubDate>
+      <category>グループディスカッション</category>
+      <category>GD攻略</category>
+      <category>2025年就活</category>
+    </item>
+  </channel>
+</rss>
