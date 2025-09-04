@@ -297,7 +297,7 @@ export default function FeedbackAnalysis() {
             無料で体験する
           </button>
           <button 
-            onClick={() => router.push("/pricing")}
+            onClick={() => router.push("/billing")}
             className="bg-transparent text-white border-2 border-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white hover:text-[#163300] transition-colors"
           >
             料金プランを見る

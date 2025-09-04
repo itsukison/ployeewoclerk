@@ -164,7 +164,7 @@ const Header = () => {
                   練習
                 </Link>
                 <Link
-                  href="/pricing"
+                  href="/billing"
                   className="text-[#163300] hover:text-[#9fe870] transition-colors font-medium"
                 >
                   料金
@@ -313,7 +313,7 @@ const Header = () => {
                     練習
                   </Link>
                   <Link
-                    href="/pricing"
+                    href="/billing"
                     className="block px-4 py-3 text-[#163300] hover:text-[#9fe870] hover:bg-gray-50/50 rounded-lg transition-colors font-medium"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >

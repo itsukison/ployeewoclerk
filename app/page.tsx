@@ -1102,7 +1102,7 @@ export default function Home() {
                         </li>
                         <li>
                           <button
-                            onClick={() => router.push("/pricing")}
+                            onClick={() => router.push("/billing")}
                             className="text-gray-300 hover:text-[#9fe870] transition-colors text-sm text-left"
                           >
                             料金プラン

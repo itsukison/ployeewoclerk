@@ -213,7 +213,7 @@ const DashboardPage = () => {
                     </a>
                   </li>
                   <li>
-                    <a href="/pricing" className="text-sm text-gray-600 hover:text-[#163300] transition-colors duration-200">
+                    <a href="/billing" className="text-sm text-gray-600 hover:text-[#163300] transition-colors duration-200">
                       料金プラン
                     </a>
                   </li>
@@ -227,12 +227,12 @@ const DashboardPage = () => {
                 </h3>
                 <ul className="space-y-3">
                   <li>
-                    <a href="/help" className="text-sm text-gray-600 hover:text-[#163300] transition-colors duration-200">
+                    <a href="/help-center" className="text-sm text-gray-600 hover:text-[#163300] transition-colors duration-200">
                       ヘルプセンター
                     </a>
                   </li>
                   <li>
-                    <a href="/interview-guide" className="text-sm text-gray-600 hover:text-[#163300] transition-colors duration-200">
+                    <a href="/blog" className="text-sm text-gray-600 hover:text-[#163300] transition-colors duration-200">
                       面接対策ガイド
                     </a>
                   </li>
@@ -251,7 +251,7 @@ const DashboardPage = () => {
                 </h3>
                 <ul className="space-y-3">
                   <li>
-                    <a href="/students" className="text-sm text-gray-600 hover:text-[#163300] transition-colors duration-200">
+                    <a href="/interview/new" className="text-sm text-gray-600 hover:text-[#163300] transition-colors duration-200">
                       就活生向け
                     </a>
                   </li>
@@ -261,7 +261,7 @@ const DashboardPage = () => {
                     </span>
                   </li>
                   <li>
-                    <a href="/enterprise" className="text-sm text-gray-600 hover:text-[#163300] transition-colors duration-200">
+                    <a href="/for-companies" className="text-sm text-gray-600 hover:text-[#163300] transition-colors duration-200">
                       企業向け
                     </a>
                   </li>

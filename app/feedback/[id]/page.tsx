@@ -106,14 +106,14 @@ const FeedbackPage = async ({ params }: FeedbackPageProps) => {
                   ? parsedData.chartData
                   : [parsedData.chartData];
 
-                // Ensure scores are numbers and properly formatted
+                // Ensure scores are numbers and properly formatted for 0-10 scale, multiply by 10 for better visualization
                 chartData = chartData
                   .map((item) => ({
                     criteria: String(item.criteria || ""),
                     score: Math.max(
                       0,
-                      Math.min(100, Math.round(Number(item.score) || 0))
-                    ),
+                      Math.min(100, Math.round(Number(item.score) * 10 || 0))
+                    ), // Multiply by 10 to convert from 0-10 to 0-100 for better chart visualization
                   }))
                   .filter((item) => item.criteria); // Remove items with empty criteria
               }

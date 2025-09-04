@@ -151,7 +151,7 @@ export default function HelpCenter() {
                 無料プランでは月1回まで利用可能です。プロプランにアップグレードすることで無制限利用が可能になります。
               </p>
               <button 
-                onClick={() => router.push("/pricing")}
+                onClick={() => router.push("/billing")}
                 className="text-[#9fe870] hover:text-[#8fd960] text-sm font-medium"
               >
                 料金プランを見る →

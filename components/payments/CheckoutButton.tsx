@@ -32,7 +32,7 @@ export function CheckoutButton({
       const { url } = await createCheckoutSession({
         planId,
         successUrl: `${window.location.origin}/dashboard?success=true`,
-        cancelUrl: `${window.location.origin}/pricing?canceled=true`
+        cancelUrl: `${window.location.origin}/billing?canceled=true`
       })
 
       if (url) {

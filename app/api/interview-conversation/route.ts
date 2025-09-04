@@ -96,12 +96,12 @@ export async function POST(request: NextRequest) {
       consulting: [
         {
           id: 'consulting_case_light',
-          prompt: 'フェルミ推定：日本のコンビニの年間コーヒー販売杯数を概算してください（仮定→分解→計算→示唆）。',
+          prompt: 'フェルミ推定：日本の大学生が1日に飲むエナジードリンクの本数を概算してください（仮定→分解→計算→示唆）。',
           expected_data: ['assumptions','structure','calculation_steps','sense_check','insights']
         },
         {
           id: 'problem_structuring',
-          prompt: '「国内アパレルECの成長が鈍化」の要因をMECEに分解し、優先仮説を1つ提示してください。',
+          prompt: '国内アパレルECの成長が鈍化」の要因をMECEに分解し、優先仮説を1つ提示してください。',
           expected_data: ['issue_tree','hypotheses','prioritization_reason']
         },
         {
@@ -111,51 +111,51 @@ export async function POST(request: NextRequest) {
         },
         {
           id: 'thinktank_policy',
-          prompt: '関心のある政策テーマと、その効果検証設計（KPI/データ/手法）を簡潔に説明してください。',
+          prompt: '関心のある社会課題（教育/環境など）と、その効果をどう測れるか説明してください。',
           expected_data: ['policy_theme','kpi','data_sources','method']
         },
         {
           id: 'consulting_fit',
-          prompt: 'ハードワーク環境で心身をどうセルフマネジメントしますか？',
+          prompt: '学業と就活・課外活動をどう両立させていますか？',
           expected_data: ['stress_signs','routines','safeguards']
         }
       ],
       finance: [
         {
           id: 'finance_markets_quickcheck',
-          prompt: '直近のマーケット（株価指数/為替/金利）の変動要因を1分で要約してください。',
+          prompt: '最近気になったニュースを1つ選び、それが株価や為替にどう影響すると思いますか？',
           expected_data: ['index_fx_rate','movement','drivers','sources']
         },
         {
           id: 'finance_news',
-          prompt: '最近注目したM&A/金融規制ニュースを挙げ、当該プレーヤーの狙いを推測してください。',
+          prompt: '注目した企業のM&Aや資金調達のニュースを挙げ、狙いを推測してください。',
           expected_data: ['news_topic','players','rationale','implications']
         },
         {
           id: 'risk_compliance',
-          prompt: 'コンプライアンスと収益性が競合する局面での判断軸を教えてください。',
+          prompt: 'アルバイトなどで利益とルールが衝突したとき、どう判断しましたか？例がない場合は、どう判断しますか？',
           expected_data: ['principles','precedents','decision']
         },
         {
           id: 'numeracy_check',
-          prompt: '年1.5%の複利で100万円を5年運用。概算最終金額を口頭で算出してください。',
+          prompt: '1000円を年5%の単利で3年運用するといくらになりますか？',
           expected_data: ['approx_method','result']
         },
         {
           id: 'client_trust',
-          prompt: '個人/法人いずれかを選び、信頼構築のための初回ヒアリング設計を説明してください。',
-          expected_data: ['segmentation','questions_plan','risk_disclosure']
+          prompt: '初対面の相手のニーズを理解するため、どんな質問を心がけますか？',
+          expected_data: ['questions_plan','risk_disclosure']
         }
       ],
       manufacturing: [
         {
           id: 'monodukuri_motivation',
-          prompt: 'ものづくりに惹かれた具体的契機と、対象製品/工程で活かせる強みを教えてください。',
+          prompt: 'ものづくりに興味を持ったきっかけを教えてください。',
           expected_data: ['trigger','target_product_or_process','skills']
         },
         {
           id: 'rd_or_prodexp',
-          prompt: '研究/設計/生産いずれかを選び、課題→仮説→実験/対策→検証の経験を説明してください。',
+          prompt: 'アルバイトやゼミ活動で、品質・コスト・納期のバランスを考えた経験を教えてください。',
           expected_data: ['problem','hypothesis','action','validation','quant_result']
         },
         {
@@ -165,51 +165,51 @@ export async function POST(request: NextRequest) {
         },
         {
           id: 'site_adaptability',
-          prompt: '現場（工場/サプライヤ）配属の生活・安全面での自己管理方針を教えてください。',
+          prompt: '工場や研究室など、安全面で注意した経験を教えてください。',
           expected_data: ['safety_mind','shift_or_transfer','healthcare']
         },
         {
           id: 'ip_and_learning',
-          prompt: '技術キャッチアップの習慣（論文/特許/展示会 等）を教えてください。',
+          prompt: '最新知識をキャッチアップするためにどんな工夫をしていますか？',
           expected_data: ['sources','cadence','recent_learning']
         }
       ],
       trading: [
         {
           id: 'why_sogo_shosha',
-          prompt: 'なぜ総合商社か。他業界ではなく商社である必然性を論理的に説明してください。',
+          prompt: 'なぜ総合商社か。他業界ではなく商社である必然性を説明してください。',
           expected_data: ['industry_reason','why_not_others','value_you_add']
         },
         {
           id: 'biz_dev_interest',
-          prompt: '興味のある事業領域と、その共通する魅力（配属に依存しない軸）を述べてください。',
+          prompt: '興味のある産業や地域を1つ挙げ、その魅力を教えてください。',
           expected_data: ['areas','common_axes','transferability']
         },
         {
           id: 'grit_and_mobility',
-          prompt: 'タフな環境（長時間/海外/未整備）で成果を出した経験を教えてください。',
+          prompt: '長時間・海外・未整備環境に近い経験（例：留学、部活合宿、長期インターン）で学んだこと、または出した成果を教えてください。',
           expected_data: ['context','actions','result','learning']
         },
         {
           id: 'stakeholder_play',
-          prompt: '多国籍の関係者を巻き込む際の交渉戦略を、具体ステップで説明してください。',
+          prompt: '多様なメンバーとのプロジェクトで合意形成した経験を説明してください。',
           expected_data: ['mapping','sequencing','give_and_take']
         },
         {
           id: 'company_specific_reason',
-          prompt: '総合商社各社の違いを踏まえ、当社を選ぶ理由と逆質問を1つずつ提示してください。',
+          prompt: '商社の中でも弊社を志望する理由を教えてください。',
           expected_data: ['positioning_view','this_company_reason','reverse_q']
         }
       ],
       it: [
         {
           id: 'tech_interest',
-          prompt: '最近キャッチアップしている技術トピックと、学習ソース/アウトプットを教えてください。',
+          prompt: '最近学んでいるIT技術やサービスについて、学習方法とアウトプットを教えてください。',
           expected_data: ['topic','sources','artifact_or_code','impact']
         },
         {
           id: 'proj_problem_solving',
-          prompt: '開発/データ/企画いずれかの小規模プロジェクトで、要件定義とスコープ管理をどう行いましたか？',
+          prompt: '小規模なグループワークやアプリ開発で、要件定義とスコープ管理をどうしましたか？',
           expected_data: ['requirements','scope','tradeoffs','result']
         },
         {
@@ -219,120 +219,117 @@ export async function POST(request: NextRequest) {
         },
         {
           id: 'security_privacy',
-          prompt: 'ユーザデータを扱う際のセキュリティ/プライバシー配慮で意識していることは？',
+          prompt: '個人情報やデータを扱う際、意識していることはありますか？',
           expected_data: ['threat_model','controls','past_behavior']
         },
         {
           id: 'dx_biz',
-          prompt: '非IT業界の課題をデジタルで解くとしたら、どの課題に何を実装しますか？',
+          prompt: '非IT分野（教育/医療/物流など）の課題を、デジタルでどう解決できると思いますか？',
           expected_data: ['target_industry','pain_point','solution','kpi']
         }
       ],
       advertising: [
         {
           id: 'campaign_pitch',
-          prompt: '20代向け新商品のプロモ案を60秒でピッチしてください（ターゲット→インサイト→施策→測定）。',
+          prompt: '大学生向け新商品のPR案を1分でピッチしてください。',
           expected_data: ['target','insight','idea','kpi']
         },
         {
           id: 'trend_sense',
-          prompt: '最近刺さった広告/コンテンツを挙げ、評価軸で言語化してください。',
+          prompt: '最近心に残った広告を挙げ、なぜ良いと思ったか説明してください。',
           expected_data: ['work','criteria','why']
         },
         {
           id: 'creative_process',
-          prompt: '企画の発散と収束のプロセスを、過去の活動例で説明してください。',
-          expected_data: ['diverge','converge','validation']
+          prompt: 'アイデアを広げてから絞り込んだ経験を教えてください。',
+          expected_data: ['expansion','narrowed','selection_reason']
         },
         {
           id: 'media_ethics',
-          prompt: '炎上/表現配慮のガイドラインをどう捉え、リスクを下げますか？',
+          prompt: 'SNSで炎上しないように気をつける点は何だと思いますか？',
           expected_data: ['guidelines','checks','fallback']
         },
         {
-          id: 'account_roleplay',
-          prompt: '（ロールプレイ）広告主から「効果が見えない」と言われた際の説明と追加提案を行ってください。',
-          expected_data: ['diagnosis','explanation','new_plan']
+          id: 'client_response',
+          prompt: 'アルバイトや団体活動で、相手に納得してもらうために工夫した説明はありますか？',
+          expected_data: ["situation_analysis","explanation_strategy","consensus_building"]
+
         }
       ],
       hr: [
         {
           id: 'sales_fit',
-          prompt: '個人/法人いずれかのRA/CA（両面/片面）を想定し、KPIの置き方と行動計画を説明してください。',
+          prompt: 'チーム活動で成果を出すため、どんな行動計画を立てましたか？',
           expected_data: ['model','kpi','activity_plan']
         },
         {
           id: 'listening_skill',
-          prompt: '候補者の「本音」を引き出した具体的ヒアリング手法を教えてください。',
+          prompt: '候補者の本音を引き出すために工夫した質問や態度は？',
           expected_data: ['questions','signals','trust_building']
         },
         {
           id: 'multi_stake',
-          prompt: '企業・候補者・社内の利害調整で難しかった場面と対応を教えてください。',
+          prompt: 'ゼミやサークル、組織内で利害が対立したとき、どう解決しましたか？',
           expected_data: ['context','tradeoffs','resolution']
         },
         {
           id: 'value_view',
-          prompt: '「成果主義」と「候補者の長期幸福」の両立をどう実現しますか？',
+          prompt: '会社が成果を出すことと、社員が長く幸せに働けることを、どうやって両立できると思いますか？',
           expected_data: ['principles','tactics','example']
         },
-        {
-          id: 'reverse_for_hr',
-          prompt: '人材業界に特化した逆質問を1つ提示し、意図を説明してください。',
-          expected_data: ['question','intent']
-        }
+        
       ],
       infrastructure: [
         {
           id: 'public_mission',
-          prompt: '公共インフラの社会的使命を一言で定義し、日々の行動に落とす方法を述べてください。',
+          prompt: '公共インフラの社会的使命を一言で表してください。',
           expected_data: ['mission_phrase','daily_translation']
         },
         {
           id: 'safety_first',
-          prompt: '安全・保安・災害対応での判断基準と、訓練/学習の習慣を教えてください。',
+          prompt: '安全に関して意識してきた経験（実験・部活・バイトなど）を教えてください。',
           expected_data: ['criteria','training','past_example']
         },
         {
           id: 'shift_and_resilience',
-          prompt: 'シフト勤務/繁忙期/緊急呼び出しがある前提で、生活設計と体調管理をどう最適化しますか？',
+          prompt: '生活リズムが乱れる環境で、体調をどう管理しますか？',
           expected_data: ['schedule_design','sleep_nutrition','fallbacks']
         },
         {
           id: 'stake_local',
-          prompt: '地域住民/行政/企業を巻き込む企画を1つ提案し、合意形成プランを説明してください。',
+          prompt: '地域の人や仲間を巻き込んだ企画を提案した経験はありますか？',
           expected_data: ['idea','stakeholders','consensus_plan']
         },
         {
           id: 'ethics_public',
-          prompt: '公共性と採算性が衝突した際の考え方を教えてください。',
+          prompt: '公共性と効率性がぶつかるとき、どう考えるべきだと思いますか？',
           expected_data: ['framework','examples','decision']
         }
       ],
       real_estate: [
         {
           id: 'real_estate_market',
-          prompt: '最近の不動産市場のトレンドと、それが投資戦略に与える影響について説明してください。',
+          prompt: '最近の不動産・建設分野のトレンドで気になったものを挙げてください。',
           expected_data: ['trend','impact','strategy']
         },
         {
           id: 'project_management',
-          prompt: '建設プロジェクトでのスケジュール管理と品質管理をどう両立させましたか？',
+          prompt: '学祭やイベント準備で、スケジュールと品質をどう両立しましたか？',
           expected_data: ['approach','challenges','outcome']
         },
         {
           id: 'client_relations',
-          prompt: '顧客との信頼関係構築で重視していることと、具体的な取り組みを教えてください。',
+          prompt: '相手と信頼関係を築くために心がけていることは何ですか？',
           expected_data: ['principles','methods','results']
         },
         {
           id: 'regulatory_compliance',
-          prompt: '建築法規や環境規制への対応で工夫していることがあれば教えてください。',
+          prompt: 'ルールや規則を守るために工夫した経験を教えてください。',
           expected_data: ['compliance_approach','innovation','efficiency']
         },
         {
           id: 'sustainability',
-          prompt: '持続可能な建設・開発に向けた取り組みや考えを聞かせてください。',
+          prompt: '持続可能なまちづくりや環境配慮で関心のあることを教えてください。',
           expected_data: ['approach','examples','future_vision']
         }
       ]

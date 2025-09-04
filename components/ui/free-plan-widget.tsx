@@ -91,7 +91,7 @@ export function FreePlanWidget({
               {getPlanPrice(planName)}
             </div>
           </div>
-          <Link href="/pricing">
+          <Link href="/billing">
             <Button variant="outline" size="sm" className="rounded-full px-2 py-1 text-xs">
               <Settings className="h-3 w-3 mr-1" />
               管理

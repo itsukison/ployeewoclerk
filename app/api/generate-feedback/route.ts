@@ -82,11 +82,12 @@ ${workflowAnalysis}
 4. **改善・強み分析** - 具体的な改善点と強みのハイライト
 
 **厳格な採点基準:**
-- **数値スコアは非常に厳しく採点**: 平均的な回答でも4-6点程度
-- **優秀な回答のみ7-9点**: 明確で具体的で印象的な内容のみ
-- **10点は例外的**: 圧倒的に優れた回答のみ
-- **不完全な回答は1-3点**: 期待要素が一部不足している場合
-- **コミュニケーション評価**: 「ええ、」「え、」「ええと、」「えと、」「あの、」「その、」等の言いよどみを厳格にチェック
+- **0-3点**: 非常に悪い回答 - 質問に適切に答えられていない、内容が不十分、論理性がない
+- **4-5点**: 平均的な回答 - 基本的な要素は含まれているが、深みや具体性に欠ける
+- **6-7点**: 平均以上の回答 - 具体的で論理的、質問に適切に答えている
+- **8-9点**: 優秀な回答 - 非常に詳細で、要点を押さえ、優れた表現力がある
+- **10点**: 完璧な回答 - 最高レベルの回答、模範的で印象的、完璧な構成と内容
+- **言いよどみペナルティ**: 「ええと、」「えと、」「え、」「ええ、」「あの、」「その、」等の言いよどみは全フェーズの評価に悪影響を与える
 
 **personality phase特別処理:**
 - personality phaseが含まれている場合、その評価内容を「強み・弱み」セクションの代わりに使用
@@ -100,18 +101,18 @@ ${workflowAnalysis}
     "feedback": "面接全体に対する包括的なフィードバック (日本語で7〜10文、具体的な強み、改善点、アドバイスを含む)"
   },
   "chartData": [
-    { "criteria": "コミュニケーション力", "score": 0 },
-    { "criteria": "論理的思考力", "score": 0 },
-    { "criteria": "志望動機", "score": 0 },
-    { "criteria": "自己分析力", "score": 0 },
-    { "criteria": "成長意欲", "score": 0 }
+    { "criteria": "フェーズ1名", "score": 0 },
+    { "criteria": "フェーズ2名", "score": 0 },
+    { "criteria": "フェーズ3名", "score": 0 },
+    { "criteria": "フェーズ4名", "score": 0 },
+    { "criteria": "フェーズ5名", "score": 0 }
   ],
   "phaseAnalysis": [
-    { "phase": "自己紹介", "score": 0, "feedback": "日本語3〜4文" },
-    { "phase": "志望動機", "score": 0, "feedback": "日本語3〜4文" },
-    { "phase": "学生時代の取り組み", "score": 0, "feedback": "日本語3〜4文" },
-    { "phase": "強み・弱み・性格", "score": 0, "feedback": "日本語3〜4文" },
-    { "phase": "業界専門質問", "score": 0, "feedback": "日本語3〜4文" }
+    { "phase": "フェーズ1名", "score": 0, "feedback": "日本語3〜4文" },
+    { "phase": "フェーズ2名", "score": 0, "feedback": "日本語3〜4文" },
+    { "phase": "フェーズ3名", "score": 0, "feedback": "日本語3〜4文" },
+    { "phase": "フェーズ4名", "score": 0, "feedback": "日本語3〜4文" },
+    { "phase": "フェーズ5名", "score": 0, "feedback": "日本語3〜4文" }
   ],
   "improvements": [
     "改善すべき具体的なポイント1 (詳細な説明)",
@@ -124,6 +125,13 @@ ${workflowAnalysis}
     "評価できる強み3 (具体的な根拠)"
   ]
 }
+
+**重要な注意事項:**
+- chartDataとphaseAnalysisの両方で、実際のフェーズ名を使用してください
+- 実際に行われたフェーズのみを評価してください（上記のワークフロー分析を参考にしてください）
+- フェーズ名の例: "self_intro", "industry_motivation", "gakuchika", "strength"/"weakness"/"personality"のいずれか, "業界固有質問"
+- chartDataのスコアとphaseAnalysisのスコアは全く同じ値にしてください (0-10スケール)
+- フェーズが5つ未満の場合は、実際に行われたフェーズのみを含めてください
 
 **面接記録:**
 ${conversationHistory.map((msg: { role: string; content: string }) => 
@@ -157,7 +165,7 @@ AI面接官が応募者の情報に基づいて動的に生成した質問によ
 
     const result = JSON.parse(completion.choices[0]?.message?.content || '{}');
     
-    // Calculate overall score based on sum of phase scores, adjusted to 100
+    // Calculate overall score as sum of phase scores times 2
     let calculatedOverallScore = 0;
     if (result.phaseAnalysis && Array.isArray(result.phaseAnalysis)) {
       const totalPhaseScore = result.phaseAnalysis.reduce((sum: number, phase: any) => {
@@ -165,17 +173,8 @@ AI面接官が応募者の情報に基づいて動的に生成した質問によ
         return sum + (isNaN(score) ? 0 : score);
       }, 0);
       
-      // Convert from phase total (max 50 for 5 phases) to 100-point scale with much stricter grading
-      calculatedOverallScore = Math.round((totalPhaseScore / 50) * 100);
-      
-      // Apply very strict grading curve - significantly reduce scores for realistic results
-      if (calculatedOverallScore > 80) {
-        calculatedOverallScore = Math.max(70, calculatedOverallScore - 20);
-      } else if (calculatedOverallScore > 65) {
-        calculatedOverallScore = Math.max(55, calculatedOverallScore - 15);
-      } else if (calculatedOverallScore > 50) {
-        calculatedOverallScore = Math.max(40, calculatedOverallScore - 10);
-      }
+      // Simply multiply by 2 (5 phases * max 10 points each * 2 = 100 max)
+      calculatedOverallScore = Math.round(totalPhaseScore * 2);
     }
     
     // Ensure the score is within 0-100 range
