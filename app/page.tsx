@@ -105,8 +105,7 @@ const structuredData = {
     "@id": "https://www.ployee.net/#webpage",
     url: "https://www.ployee.net",
     name: "AI面接練習プラットフォーム「プロイー」",
-    description:
-      "AI面接官との実践練習で面接突破率を5倍向上",
+    description: "AI面接官との実践練習で面接突破率を5倍向上",
     primaryImageOfPage: {
       "@type": "ImageObject",
       url: "https://www.ployee.net/og-image.jpg",
@@ -359,7 +358,6 @@ export default function Home() {
 
   return (
     <>
-
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
@@ -372,7 +370,7 @@ export default function Home() {
             {/* Background gradient overlay */}
             <div className="absolute inset-0 bg-[#142d25]"></div>
 
-            <div className="mobile-container relative z-10">
+            <div className="mobile-container relative z-10 px-4 sm:px-6">
               <div className="text-left mobile-mb-medium">
                 {/* Feature badges - moved down to account for navbar */}
                 <div className="flex flex-wrap gap-2 sm:gap-4 mobile-mb-medium mt-26 sm:mt-32">
@@ -490,9 +488,11 @@ export default function Home() {
                 >
                   プロイーはAI面接官による実践的な面接練習で、次世代の就活・転職活動をサポートします。
                   <br className="hidden sm:block" />
-                  <span className="block sm:inline">
+                  <span className="hidden sm:inline">
                     {" "}
-                    詳細な分析、リアルタイムフィードバック、そして成長を実感できる環境—すべてを統合した<br />プラットフォームです。
+                    詳細な分析、リアルタイムフィードバック、そして成長を実感できる環境—すべてを統合した
+                    <br />
+                    プラットフォームです。
                   </span>
                 </p>
 
@@ -505,7 +505,7 @@ export default function Home() {
                     <img
                       src="/companies.png"
                       alt="信頼される企業のロゴ - 多くの就活生と転職者に選ばれています"
-                      className="w-full max-w-xs sm:max-w-2xl opacity-60 hover:opacity-80 transition-opacity duration-300"
+                      className="w-full h-auto max-w-xs sm:max-w-2xl opacity-60 hover:opacity-80 transition-opacity duration-300"
                       loading="lazy"
                     />
                   </div>
@@ -517,7 +517,7 @@ export default function Home() {
           {/* Enhanced Problem Section - Campfire.ai Style */}
           <section
             ref={problemSectionRef}
-            className="mobile-section-padding bg-white relative overflow-hidden"
+            className="mobile-section-padding bg-white relative overflow-hidden px-4 sm:px-6 py-6 sm:py-8"
           >
             <div className="mobile-container">
               <div className="text-center mobile-mb-large">
@@ -535,11 +535,11 @@ export default function Home() {
                 </p>
               </div>
 
-              <div className="mobile-grid-2 gap-8 lg:gap-20 items-center">
+              <div className="mobile-grid-2 gap-6 lg:gap-20 items-center">
                 {/* Image - Order changes for mobile (image first) */}
                 <div
                   ref={problemImageRef}
-                  className="relative flex justify-center items-center min-h-[300px] sm:min-h-[400px] lg:min-h-[600px] order-1 lg:order-1"
+                  className="relative flex justify-center items-center min-h-[240px] sm:min-h-[400px] lg:min-h-[600px] order-1 lg:order-1"
                 >
                   <div className="relative">
                     {/* Background decorative elements */}
@@ -552,7 +552,7 @@ export default function Home() {
                         alt="AI面接練習システム"
                         width={300}
                         height={300}
-                        className="drop-shadow-lg w-full max-w-[300px] sm:max-w-[400px] lg:max-w-[500px] h-auto"
+                        className="drop-shadow-lg w-full h-auto max-w-[260px] sm:max-w-[400px] lg:max-w-[500px]"
                       />
                     </div>
                   </div>
@@ -571,7 +571,10 @@ export default function Home() {
                         実践的な面接練習を実現
                       </span>
                     </h3>
-                    <p className="text-base sm:text-lg text-gray-600 leading-relaxed text-center lg:text-left">
+                    <p className="text-base text-gray-600 leading-relaxed text-center lg:text-left block sm:hidden">
+                      双方向のAI対話で本番に近い練習。分析とフィードバックで着実に上達。
+                    </p>
+                    <p className="hidden sm:block sm:text-lg text-gray-600 leading-relaxed text-center lg:text-left">
                       従来の一方向的な学習ではなく、AI面接官との双方向対話により、
                       本番に近い環境での練習が可能。詳細な分析とフィードバックで、
                       あなたの面接スキルを確実に向上させます。
@@ -663,7 +666,7 @@ export default function Home() {
           </section>
 
           {/* Features Section */}
-          <section className="mobile-section-padding relative z-10">
+          <section className="mobile-section-padding relative z-10 px-4 sm:px-6 py-6 sm:py-8">
             <div className="mobile-container">
               <h2 className="sr-only">AI面接練習サービスの特徴</h2>
               <div className="mobile-grid-2 gap-8 lg:gap-16 items-center">
@@ -675,7 +678,7 @@ export default function Home() {
                   <div className="space-y-4 sm:space-y-6">
                     <p className="text-base sm:text-lg lg:text-xl text-gray-600 leading-relaxed text-center lg:text-left">
                       AIとの<strong>リアルタイム対話</strong>
-                      で実践的な面接練習を行い、<br />
+                      で実践的な面接練習を行い、
                       <strong>業界別特化した</strong>質問にも対応。
                       <strong>詳細な分析とフィードバック</strong>を通じて、
                       あなたの面接スキルを総合的に向上させます。
@@ -688,7 +691,7 @@ export default function Home() {
                   <img
                     src="/interview.png"
                     alt="interview"
-                    className="w-full max-w-[400px] sm:max-w-[500px] lg:max-w-full h-auto mx-auto"
+                    className="w-full h-auto max-w-[360px] sm:max-w-[500px] lg:max-w-full mx-auto"
                     width={1000}
                     height={1000}
                   />
@@ -706,14 +709,19 @@ export default function Home() {
               <img
                 src="/interviewericon.png"
                 alt="Interviewer Icon"
-                className="w-48 h-48 sm:w-60 sm:h-60 lg:w-80 lg:h-80 object-contain absolute -top-24 sm:-top-30 lg:-top-40 left-1/2 -translate-x-1/2 drop-shadow-xl"
+                className="w-56 h-56 sm:w-60 sm:h-60 lg:w-80 lg:h-80 object-contain absolute -top-24 sm:-top-30 lg:-top-40 left-1/2 -translate-x-1/2 drop-shadow-xl"
                 style={{ zIndex: 2 }}
                 draggable={false}
               />
               <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold text-[#9fe870] text-center mobile-mb-small leading-tight mt-2">
-                過去問で鍛えられたAI面接官が
-                <br className="hidden sm:block" />
-                <span className="block sm:inline">あなたの自信を引き出す</span>
+                <span className="block sm:hidden">
+                  AI面接官が自信を引き出す
+                </span>
+                <span className="hidden sm:block">
+                  過去問で鍛えられたAI面接官が
+                  <br />
+                  あなたの自信を引き出す
+                </span>
               </h2>
               <p className="text-sm sm:text-base lg:text-lg xl:text-xl text-white text-center mobile-mb-medium max-w-2xl px-4">
                 豊富な過去問データでAIが徹底指導。自信を持って本番に挑もう
@@ -730,7 +738,7 @@ export default function Home() {
           {/* Enhanced Speed Comparison Section - Campfire.ai Style */}
           <section
             ref={speedSectionRef}
-            className="mobile-section-padding bg-white relative overflow-hidden"
+            className="mobile-section-padding bg-white relative overflow-hidden px-4 sm:px-6 py-6 sm:py-8"
           >
             <div className="mobile-container relative z-10">
               {/* Main Header */}
@@ -1065,7 +1073,9 @@ export default function Home() {
                     内定を掴む
                   </h2>
                   <p className="text-gray-300 text-base sm:text-lg mobile-mb-medium leading-relaxed">
-                    プロイーで面接スキルを向上させ、<br />理想の企業への内定を実現しましょう。
+                    プロイーで面接スキルを向上させ、
+                    <br />
+                    理想の企業への内定を実現しましょう。
                   </p>
                   <button
                     className="bg-[#9fe870] text-[#163300] w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold text-base sm:text-lg hover:bg-[#9fe870]/90 transition-all duration-300 hover:scale-105 shadow-lg"
@@ -1086,7 +1096,9 @@ export default function Home() {
                       <ul className="space-y-3">
                         <li>
                           <button
-                            onClick={() => router.push("/ai-interview-practice")}
+                            onClick={() =>
+                              router.push("/ai-interview-practice")
+                            }
                             className="text-gray-300 hover:text-[#9fe870] transition-colors text-sm text-left"
                           >
                             AI面接練習
