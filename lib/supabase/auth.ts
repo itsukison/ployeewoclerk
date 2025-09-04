@@ -265,8 +265,8 @@ export async function updateUserSubscription(
   try {
     const { data, error } = await supabaseAdmin.rpc('update_user_subscription', {
       customer_id: stripeCustomerId,
-      subscription_id: subscriptionId,
-      status,
+      subscription_id_param: subscriptionId,
+      status_param: status,
       plan_name: planName
     })
 

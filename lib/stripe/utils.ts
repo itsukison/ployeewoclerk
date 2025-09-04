@@ -183,6 +183,8 @@ async function handleSubscriptionChange(subscription: any) {
     const priceId = subscription.items?.data?.[0]?.price?.id
     let planId: PlanId = 'free'
 
+    console.log(`Processing subscription change: customer=${customerId}, priceId=${priceId}, status=${status}`)
+
     // Map price ID to plan
     if (priceId === STRIPE_CONFIG.prices.basic) {
       planId = 'basic'
@@ -190,15 +192,17 @@ async function handleSubscriptionChange(subscription: any) {
       planId = 'premium'
     }
 
+    console.log(`Mapped price ${priceId} to plan: ${planId}`)
+
     // Update user subscription via admin RPC to bypass RLS
-    await updateUserSubscription(
+    const result = await updateUserSubscription(
       customerId,
       subscriptionId,
       mapStripeStatusToLocal(status),
       planId
     )
 
-    console.log(`Updated subscription for customer ${customerId}: plan=${planId}, status=${status}`)
+    console.log(`Updated subscription for customer ${customerId}: plan=${planId}, status=${status}, result=${result}`)
   } catch (error) {
     console.error('handleSubscriptionChange error:', error)
     throw error
