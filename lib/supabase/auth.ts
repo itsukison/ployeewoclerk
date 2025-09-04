@@ -205,6 +205,51 @@ export async function getUserPlanLimits(userId?: string) {
   }
 }
 
+export async function getEffectiveUserLimits(userId?: string) {
+  try {
+    let currentUserId = userId
+    if (!currentUserId) {
+      const { userId: authUserId } = await auth()
+      if (!authUserId) {
+        throw new Error("User not authenticated")
+      }
+      currentUserId = authUserId
+    }
+
+    const { data, error } = await supabaseAdmin.rpc('get_effective_user_limits', {
+      user_id: currentUserId
+    })
+
+    if (error) {
+      console.error('Effective limits fetch error:', error)
+      throw new Error(`Failed to fetch effective limits: ${error.message}`)
+    }
+
+    if (!data || data.length === 0) {
+      // Default to free plan limits
+      return {
+        interview_limit: 1,
+        es_limit: 5,
+        plan_name: 'フリープラン',
+        is_grandfathered: false,
+        expires_at: null
+      }
+    }
+
+    return data[0]
+  } catch (error) {
+    console.error('getEffectiveUserLimits error:', error)
+    // Return safe defaults on error
+    return {
+      interview_limit: 1,
+      es_limit: 5,
+      plan_name: 'フリープラン',
+      is_grandfathered: false,
+      expires_at: null
+    }
+  }
+}
+
 // Update user profile
 export async function updateUserProfile(updates: {
   name?: string

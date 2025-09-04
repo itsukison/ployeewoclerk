@@ -12,6 +12,15 @@ interface SubscriptionInfo {
   plan: string
   planName: string
   subscriptionStatus: string | null
+  grandfathered?: {
+    isGrandfathered: boolean
+    grandfatheredPlan: string
+    expiresAt: Date | null
+    limits: {
+      interviews: number
+      esCorrections: number
+    }
+  } | null
 }
 
 export default function BillingPage() {
@@ -102,6 +111,42 @@ export default function BillingPage() {
             {error && (
               <div className="mb-8 p-4 rounded-lg bg-red-50 border border-red-200 max-w-2xl mx-auto">
                 <p className="text-sm text-red-600 text-center">{error}</p>
+              </div>
+            )}
+
+            {subscriptionInfo?.grandfathered?.isGrandfathered && (
+              <div className="mb-8 p-6 rounded-2xl bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 max-w-2xl mx-auto">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-amber-800">継続特典が適用中</h3>
+                    <p className="text-sm text-amber-700">
+                      {subscriptionInfo.grandfathered.grandfatheredPlan}の利用制限を継続してご利用いただけます
+                    </p>
+                  </div>
+                </div>
+                <div className="space-y-2 text-sm text-amber-700">
+                  <div className="flex justify-between">
+                    <span>面接練習:</span>
+                    <span className="font-semibold">{subscriptionInfo.grandfathered.limits.interviews}回/月</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>ES添削:</span>
+                    <span className="font-semibold">{subscriptionInfo.grandfathered.limits.esCorrections}回/月</span>
+                  </div>
+                  {subscriptionInfo.grandfathered.expiresAt && (
+                    <div className="flex justify-between pt-2 border-t border-amber-200">
+                      <span>特典終了予定:</span>
+                      <span className="font-semibold">
+                        {subscriptionInfo.grandfathered.expiresAt.toLocaleDateString('ja-JP')}
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 

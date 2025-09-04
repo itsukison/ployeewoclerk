@@ -432,12 +432,34 @@ export async function getUserSubscriptionInfo(userId?: string) {
       }
     }
 
+    // Get grandfathered limits information
+    let grandfatheredInfo = null
+    try {
+      const { getEffectiveUserLimits } = await import('@/lib/supabase/auth')
+      const effectiveLimits = await getEffectiveUserLimits(targetUserId)
+      
+      if (effectiveLimits.is_grandfathered) {
+        grandfatheredInfo = {
+          isGrandfathered: true,
+          grandfatheredPlan: effectiveLimits.plan_name,
+          expiresAt: effectiveLimits.expires_at ? new Date(effectiveLimits.expires_at) : null,
+          limits: {
+            interviews: effectiveLimits.interview_limit,
+            esCorrections: effectiveLimits.es_limit
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch grandfathered info:', error)
+    }
+
     return {
       plan: profile.plan,
       planName: PLANS[profile.plan as PlanId]?.name || 'Unknown Plan',
       subscriptionStatus: profile.subscription_status,
       subscription: subscriptionInfo,
-      stripeCustomerId: profile.stripe_customer_id
+      stripeCustomerId: profile.stripe_customer_id,
+      grandfathered: grandfatheredInfo
     }
   } catch (error) {
     console.error('getUserSubscriptionInfo error:', error)

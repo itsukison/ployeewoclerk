@@ -1,6 +1,6 @@
 "use server";
 
-import { auth, getUserPlanLimits, hasFeature, createClient } from "../supabase/auth";
+import { auth, getUserPlanLimits, getEffectiveUserLimits, hasFeature, createClient } from "../supabase/auth";
 
 /** First day of current month: 'YYYY-MM-01' */
 function monthStart() {
@@ -159,7 +159,7 @@ export async function trackInterviewSessionStart(): Promise<void> {
 }
 
 /**
- * Get user's interview plan limit based on Supabase user plan
+ * Get user's interview plan limit based on Supabase user plan (includes grandfathered limits)
  * @returns number of interviews allowed per month
  */
 export async function getUserPlanLimit(): Promise<number> {
@@ -167,7 +167,7 @@ export async function getUserPlanLimit(): Promise<number> {
     const { userId } = await auth();
     if (!userId) return 1; // Return default for unauthenticated users
     
-    const limits = await getUserPlanLimits();
+    const limits = await getEffectiveUserLimits();
     return limits.interview_limit;
   } catch (error) {
     console.error('Error getting user plan limit:', error);
@@ -178,7 +178,7 @@ export async function getUserPlanLimit(): Promise<number> {
 }
 
 /**
- * Get user's ES correction plan limit based on Supabase user plan
+ * Get user's ES correction plan limit based on Supabase user plan (includes grandfathered limits)
  * @returns number of ES corrections allowed per month
  */
 export async function getESPlanLimit(): Promise<number> {
@@ -186,7 +186,7 @@ export async function getESPlanLimit(): Promise<number> {
     const { userId } = await auth();
     if (!userId) return 5; // Return default for unauthenticated users
     
-    const limits = await getUserPlanLimits();
+    const limits = await getEffectiveUserLimits();
     return limits.es_limit;
   } catch (error) {
     console.error('Error getting user ES plan limit:', error);

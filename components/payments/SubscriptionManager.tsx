@@ -18,6 +18,15 @@ interface SubscriptionInfo {
     cancel_at_period_end: boolean
   } | null
   stripeCustomerId: string | null
+  grandfathered?: {
+    isGrandfathered: boolean
+    grandfatheredPlan: string
+    expiresAt: Date | null
+    limits: {
+      interviews: number
+      esCorrections: number
+    }
+  } | null
 }
 
 export function SubscriptionManager() {
@@ -160,6 +169,39 @@ export function SubscriptionManager() {
               {subscriptionInfo.planName}
             </span>
           </div>
+
+          {subscriptionInfo.grandfathered?.isGrandfathered && (
+            <div className="p-4 rounded-lg bg-amber-50 border border-amber-200">
+              <div className="flex items-center gap-2 mb-2">
+                <svg className="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <span className="text-sm font-semibold text-amber-800">継続特典適用中</span>
+              </div>
+              <div className="space-y-1 text-xs text-amber-700">
+                <div className="flex justify-between">
+                  <span>適用プラン:</span>
+                  <span className="font-medium">{subscriptionInfo.grandfathered.grandfatheredPlan}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>面接練習:</span>
+                  <span className="font-medium">{subscriptionInfo.grandfathered.limits.interviews}回/月</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>ES添削:</span>
+                  <span className="font-medium">{subscriptionInfo.grandfathered.limits.esCorrections}回/月</span>
+                </div>
+                {subscriptionInfo.grandfathered.expiresAt && (
+                  <div className="flex justify-between pt-1 border-t border-amber-200">
+                    <span>特典終了:</span>
+                    <span className="font-medium">
+                      {subscriptionInfo.grandfathered.expiresAt.toLocaleDateString('ja-JP')}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {subscriptionInfo.subscriptionStatus && (
             <div className="flex items-center justify-between">
