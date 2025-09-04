@@ -37,9 +37,22 @@ export async function createCheckoutSession({
       throw new Error(`Plan ${planId} does not have a Stripe price ID`)
     }
 
+    console.log(`Creating checkout session:`, {
+      planId,
+      priceId: plan.stripePriceId,
+      userId: targetUserId,
+      customerEmail: profile.email
+    })
+
     // Validate price ID exists in Stripe
     try {
-      await stripe.prices.retrieve(plan.stripePriceId)
+      const priceData = await stripe.prices.retrieve(plan.stripePriceId)
+      console.log(`Price validation successful:`, {
+        priceId: priceData.id,
+        amount: priceData.unit_amount,
+        currency: priceData.currency,
+        active: priceData.active
+      })
     } catch (priceError) {
       console.error('Invalid Stripe price ID:', plan.stripePriceId, priceError)
       throw new Error(`Invalid price configuration for plan ${planId}`)
@@ -141,23 +154,35 @@ export async function createCustomerPortalSession(returnUrl: string, userId?: st
 // Handle Stripe webhook events
 export async function handleStripeWebhook(event: any) {
   try {
-    console.log('Processing Stripe webhook:', event.type)
+    console.log('Processing Stripe webhook:', {
+      type: event.type,
+      id: event.id,
+      created: new Date(event.created * 1000).toISOString()
+    })
 
     switch (event.type) {
       case 'customer.subscription.created':
+        console.log('Handling subscription.created event')
+        await handleSubscriptionChange(event.data.object)
+        break
+        
       case 'customer.subscription.updated':
+        console.log('Handling subscription.updated event')
         await handleSubscriptionChange(event.data.object)
         break
 
       case 'customer.subscription.deleted':
+        console.log('Handling subscription.deleted event')
         await handleSubscriptionCancellation(event.data.object)
         break
 
       case 'invoice.payment_succeeded':
+        console.log('Handling payment_succeeded event')
         await handlePaymentSuccess(event.data.object)
         break
 
       case 'invoice.payment_failed':
+        console.log('Handling payment_failed event')
         await handlePaymentFailure(event.data.object)
         break
 
@@ -165,6 +190,7 @@ export async function handleStripeWebhook(event: any) {
         console.log('Unhandled webhook event type:', event.type)
     }
 
+    console.log(`Webhook ${event.type} processed successfully`)
     return { received: true }
   } catch (error) {
     console.error('handleStripeWebhook error:', error)
@@ -183,16 +209,36 @@ async function handleSubscriptionChange(subscription: any) {
     const priceId = subscription.items?.data?.[0]?.price?.id
     let planId: PlanId = 'free'
 
-    console.log(`Processing subscription change: customer=${customerId}, priceId=${priceId}, status=${status}`)
+    console.log(`Processing subscription change:`, {
+      customer: customerId,
+      subscriptionId,
+      priceId,
+      status,
+      expectedBasicPrice: STRIPE_CONFIG.prices.basic,
+      expectedPremiumPrice: STRIPE_CONFIG.prices.premium
+    })
 
-    // Map price ID to plan
+    // Map price ID to plan with detailed logging
     if (priceId === STRIPE_CONFIG.prices.basic) {
       planId = 'basic'
+      console.log('✅ Matched BASIC plan price ID')
     } else if (priceId === STRIPE_CONFIG.prices.premium) {
       planId = 'premium'
+      console.log('✅ Matched PREMIUM plan price ID')
+    } else {
+      console.log('❌ Price ID did not match any known plans, defaulting to free')
+      console.log('Available price IDs:', {
+        basic: STRIPE_CONFIG.prices.basic,
+        premium: STRIPE_CONFIG.prices.premium
+      })
+      console.log('Received price ID:', priceId)
+      
+      // If we can't determine the plan, we should still try to update the subscription
+      // but log this as a potential configuration issue
+      console.warn('⚠️  CONFIGURATION WARNING: Unknown price ID detected. Please verify your Stripe price IDs in environment variables.')
     }
 
-    console.log(`Mapped price ${priceId} to plan: ${planId}`)
+    console.log(`Final mapping: price ${priceId} → plan: ${planId}`)
 
     // Update user subscription via admin RPC to bypass RLS
     const result = await updateUserSubscription(
@@ -202,7 +248,13 @@ async function handleSubscriptionChange(subscription: any) {
       planId
     )
 
-    console.log(`Updated subscription for customer ${customerId}: plan=${planId}, status=${status}, result=${result}`)
+    console.log(`Subscription update result:`, {
+      customer: customerId,
+      plan: planId,
+      status,
+      rpcResult: result,
+      success: result === true
+    })
   } catch (error) {
     console.error('handleSubscriptionChange error:', error)
     throw error
@@ -229,8 +281,32 @@ async function handlePaymentSuccess(invoice: any) {
     const subscriptionId = invoice.subscription
 
     if (subscriptionId) {
-      await updateUserSubscription(customerId, subscriptionId, 'active')
-      console.log(`Payment succeeded for customer ${customerId}`)
+      console.log(`Processing payment success for customer ${customerId}, subscription ${subscriptionId}`)
+      
+      // Get the subscription to determine the plan
+      try {
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+        const priceId = subscription.items?.data?.[0]?.price?.id
+        let planId: PlanId = 'free'
+
+        // Map price ID to plan (same logic as handleSubscriptionChange)
+        if (priceId === STRIPE_CONFIG.prices.basic) {
+          planId = 'basic'
+        } else if (priceId === STRIPE_CONFIG.prices.premium) {
+          planId = 'premium'
+        }
+
+        console.log(`Payment success: mapped price ${priceId} to plan ${planId}`)
+
+        // Update with both status and plan to ensure consistency
+        await updateUserSubscription(customerId, subscriptionId, 'active', planId)
+        console.log(`Payment succeeded for customer ${customerId}, set to plan ${planId}`)
+      } catch (subError) {
+        console.error('Failed to retrieve subscription for payment success:', subError)
+        // Fallback: just update status without plan
+        await updateUserSubscription(customerId, subscriptionId, 'active')
+        console.log(`Payment succeeded for customer ${customerId} (status only)`)
+      }
     }
   } catch (error) {
     console.error('handlePaymentSuccess error:', error)

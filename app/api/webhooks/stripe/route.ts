@@ -9,6 +9,8 @@ export async function POST(request: NextRequest) {
     const headersList = await headers()
     const signature = headersList.get('stripe-signature')
 
+    console.log('Webhook received, body length:', body.length)
+
     if (!signature) {
       console.error('Missing stripe-signature header')
       return NextResponse.json(
@@ -25,6 +27,7 @@ export async function POST(request: NextRequest) {
         signature,
         STRIPE_CONFIG.webhookSecret
       )
+      console.log('Webhook signature verified successfully')
     } catch (err) {
       console.error('Webhook signature verification failed:', err)
       return NextResponse.json(
@@ -33,11 +36,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log('Received Stripe webhook:', event.type, event.id)
+    console.log('Received Stripe webhook:', {
+      type: event.type,
+      id: event.id,
+      livemode: event.livemode,
+      created: event.created
+    })
 
     // Handle the webhook event
     await handleStripeWebhook(event)
 
+    console.log('Webhook processed successfully')
     return NextResponse.json({ received: true })
   } catch (error) {
     console.error('Stripe webhook error:', error)
