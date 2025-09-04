@@ -130,7 +130,7 @@ export async function createCheckoutSession({
         
         // Determine if this is an upgrade or downgrade
         const currentSubscription: Stripe.Subscription = existingSubscriptions.data[0]
-        const currentPriceId = currentSubscription.items?.data?.[0]?.price?.id
+        const currentPriceId = (currentSubscription as any).items?.data?.[0]?.price?.id
         const newPriceId = plan.stripePriceId
         
         let currentPlan: string = 'free'
@@ -161,7 +161,7 @@ export async function createCheckoutSession({
           // DOWNGRADE: Schedule cancellation at period end and create grandfathered limits
           console.log('Processing DOWNGRADE: scheduling cancellation at period end')
           
-          const periodEnd = new Date(currentSubscription.current_period_end * 1000)
+          const periodEnd = new Date((currentSubscription as any).current_period_end * 1000)
           
           // Update existing subscription to cancel at period end
           await stripe.subscriptions.update(currentSubscription.id, {
@@ -183,7 +183,7 @@ export async function createCheckoutSession({
           }
           
           // Schedule the new subscription to start at the period end
-          sessionConfig.subscription_data.trial_end = currentSubscription.current_period_end
+          sessionConfig.subscription_data.trial_end = (currentSubscription as any).current_period_end
           sessionConfig.subscription_data.proration_behavior = 'none'
           console.log(`New subscription will start at: ${periodEnd.toISOString()}`)
           
@@ -289,12 +289,12 @@ export async function handleStripeWebhook(event: any) {
 // Handle subscription changes
 async function handleSubscriptionChange(subscription: Stripe.Subscription) {
   try {
-    const customerId = subscription.customer
+    const customerId = (subscription as any).customer
     const subscriptionId = subscription.id
     const status = subscription.status
     
     // Get price ID to determine plan
-    const priceId = subscription.items?.data?.[0]?.price?.id
+    const priceId = (subscription as any).items?.data?.[0]?.price?.id
     let planId: PlanId = 'free'
 
     console.log(`Processing subscription change:`, {
@@ -352,7 +352,7 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
 // Handle subscription cancellation
 async function handleSubscriptionCancellation(subscription: Stripe.Subscription) {
   try {
-    const customerId = subscription.customer
+    const customerId = (subscription as any).customer
     // Set status to canceled; RPC maps canceled/inactive to free plan
     await updateUserSubscription(customerId, undefined, 'canceled')
     console.log(`Cancelled subscription for customer ${customerId}`)
@@ -374,7 +374,7 @@ async function handlePaymentSuccess(invoice: any) {
       // Get the subscription to determine the plan
       try {
         const subscription = await stripe.subscriptions.retrieve(subscriptionId)
-        const priceId = subscription.items?.data?.[0]?.price?.id
+        const priceId = (subscription as any).items?.data?.[0]?.price?.id
         let planId: PlanId = 'free'
 
         // Map price ID to plan (same logic as handleSubscriptionChange)
