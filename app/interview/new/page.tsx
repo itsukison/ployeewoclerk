@@ -61,17 +61,22 @@ const page = async () => {
       <div className="min-h-screen bg-white">
         {/* Header Section */}
         <div className="py-8 sm:py-12 lg:py-16">
-          <div className="text-center mb-8 sm:mb-12 px-4">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-[#163300] mb-4 sm:mb-6">
-              AI面接の準備をしましょう
+          <div className="text-center mb-8 sm:mb-12 px-6 sm:px-4">
+            <h1 className="text-3xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-[#163300] mb-4 sm:mb-6">
+              AI面接の準備 
+              <span className="hidden sm:inline">
+              をしましょう
+              </span>
             </h1>
-            <p className="text-base sm:text-lg lg:text-xl text-gray-600 font-semibold max-w-2xl mx-auto leading-relaxed">
+            <p className="px-6 sm:px-0 text-sm sm:text-lg  lg:text-xl text-gray-600 font-semibold max-w-2xl mx-auto leading-relaxed">
               あなたの情報を入力して、パーソナライズされた
               <strong>面接練習</strong>を始めましょう
             </p>
           </div>
 
-          <InterviewForm />
+          <div className="px-6 sm:px-0">
+            <InterviewForm />
+          </div>
         </div>
       </div>
     </>

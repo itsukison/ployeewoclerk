@@ -25,7 +25,7 @@ const ESCorrectionPage = () => {
   const [formData, setFormData] = useState<FormData>({
     companyName: "",
     question: "",
-    answer: ""
+    answer: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -61,23 +61,23 @@ const ESCorrectionPage = () => {
   };
 
   const handleInputChange = (field: keyof FormData, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
-    
+
     // Clear error when user starts typing
     if (errors[field]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [field]: undefined
+        [field]: undefined,
       }));
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -89,7 +89,7 @@ const ESCorrectionPage = () => {
       console.log("Submitting ES correction:", {
         companyName: formData.companyName,
         question: formData.question,
-        answer: formData.answer.substring(0, 100) + "..."
+        answer: formData.answer.substring(0, 100) + "...",
       });
 
       const response = await fetch("/api/analyze-es", {
@@ -100,7 +100,7 @@ const ESCorrectionPage = () => {
         body: JSON.stringify({
           companyName: formData.companyName,
           question: formData.question,
-          answer: formData.answer
+          answer: formData.answer,
         }),
       });
 
@@ -110,19 +110,19 @@ const ESCorrectionPage = () => {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         console.error("API Error:", errorData);
-        
+
         // If the error indicates we should redirect to billing, do so
         if (errorData.redirectToBilling) {
           router.push("/billing");
           return;
         }
-        
+
         throw new Error(errorData.error || "ES分析に失敗しました");
       }
 
       const result = await response.json();
       console.log("API Result:", result);
-      
+
       if (result.id) {
         // Navigate to results page with the correction ID
         router.push(`/es-correction/result/${result.id}`);
@@ -132,8 +132,8 @@ const ESCorrectionPage = () => {
     } catch (error) {
       console.error("ES submission error:", error);
       setSubmitError(
-        error instanceof Error 
-          ? error.message 
+        error instanceof Error
+          ? error.message
           : "ES分析中にエラーが発生しました。もう一度お試しください。"
       );
     } finally {
@@ -148,13 +148,13 @@ const ESCorrectionPage = () => {
         try {
           const [currentUsage, planLimit] = await Promise.all([
             getCurrentESUsage(),
-            getESPlanLimit()
+            getESPlanLimit(),
           ]);
-          
+
           setUsageInfo({
             currentUsage,
             planLimit,
-            remainingCorrections: Math.max(0, planLimit - currentUsage)
+            remainingCorrections: Math.max(0, planLimit - currentUsage),
           });
         } catch (error) {
           console.error("Error loading usage info:", error);
@@ -162,7 +162,7 @@ const ESCorrectionPage = () => {
           setUsageInfo({
             currentUsage: 0,
             planLimit: 5,
-            remainingCorrections: 5
+            remainingCorrections: 5,
           });
         } finally {
           setIsLoadingUsage(false);
@@ -173,31 +173,37 @@ const ESCorrectionPage = () => {
     }
   }, [loading, user]);
 
-  const isFormValid = formData.companyName.trim() && 
-                     formData.question.trim() && 
-                     formData.answer.trim().length >= 50 &&
-                     formData.answer.trim().length <= 2000;
+  const isFormValid =
+    formData.companyName.trim() &&
+    formData.question.trim() &&
+    formData.answer.trim().length >= 50 &&
+    formData.answer.trim().length <= 2000;
 
-  const canSubmit = isFormValid && usageInfo && usageInfo.remainingCorrections > 0;
+  const canSubmit =
+    isFormValid && usageInfo && usageInfo.remainingCorrections > 0;
 
   return (
     <div className="min-h-screen bg-white">
       <AutoSignIn nonClosableModal={true}>
         {/* Header Section */}
         <div className="py-8 sm:py-12 lg:py-16">
-          <div className="text-center mb-8 sm:mb-12 px-4">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-[#163300] mb-4 sm:mb-6">
-              ES添削の準備をしましょう
+          <div className="text-center mb-8 sm:mb-12 px-6 sm:px-4">
+            <h1 className="text-3xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-[#163300] mb-4 sm:mb-6">
+              ES添削
+              <span className="hidden sm:inline">
+              の準備をしましょう
+              </span>
             </h1>
-            <p className="text-base sm:text-lg lg:text-xl text-gray-600 font-semibold max-w-2xl mx-auto leading-relaxed">
-              エントリーシート情報を入力して、<strong>AI添削</strong>を始めましょう
+            <p className="px-6 sm:px-0 text-sm sm:text-lg lg:text-xl text-gray-600 font-semibold max-w-2xl mx-auto leading-relaxed">
+              エントリーシート情報を入力して、<strong>AI添削</strong>
+              を始めましょう
             </p>
-            
+
             {/* Usage Information */}
           </div>
 
           {/* Form */}
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+          <div className="max-w-6xl mx-auto px-10 sm:px-6 lg:px-8 xl:px-12">
             <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
               {/* ES Information Section */}
               <div className="space-y-4 sm:space-y-6">
@@ -206,14 +212,19 @@ const ESCorrectionPage = () => {
                 </h2>
 
                 <div>
-                  <label htmlFor="companyName" className="block text-sm sm:text-base font-semibold text-[#163300] mb-2">
+                  <label
+                    htmlFor="companyName"
+                    className="block text-sm sm:text-base font-semibold text-[#163300] mb-2"
+                  >
                     企業名 <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     id="companyName"
                     value={formData.companyName}
-                    onChange={(e) => handleInputChange("companyName", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("companyName", e.target.value)
+                    }
                     placeholder="例：株式会社プロイー"
                     className={`
                       w-full px-4 py-3 sm:py-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#9fe870] focus:border-transparent text-sm sm:text-base h-10 sm:h-12
@@ -222,7 +233,9 @@ const ESCorrectionPage = () => {
                     disabled={isSubmitting}
                   />
                   {errors.companyName && (
-                    <p className="mt-1 text-sm text-red-500">{errors.companyName}</p>
+                    <p className="mt-1 text-sm text-red-500">
+                      {errors.companyName}
+                    </p>
                   )}
                 </div>
               </div>
@@ -234,13 +247,18 @@ const ESCorrectionPage = () => {
                 </h2>
 
                 <div>
-                  <label htmlFor="question" className="block text-sm sm:text-base font-semibold text-[#163300] mb-2">
+                  <label
+                    htmlFor="question"
+                    className="block text-sm sm:text-base font-semibold text-[#163300] mb-2"
+                  >
                     質問内容 <span className="text-red-500">*</span>
                   </label>
                   <textarea
                     id="question"
                     value={formData.question}
-                    onChange={(e) => handleInputChange("question", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("question", e.target.value)
+                    }
                     placeholder="例：志望動機を教えてください（400字以内）"
                     rows={3}
                     className={`
@@ -250,7 +268,9 @@ const ESCorrectionPage = () => {
                     disabled={isSubmitting}
                   />
                   {errors.question && (
-                    <p className="mt-1 text-sm text-red-500">{errors.question}</p>
+                    <p className="mt-1 text-sm text-red-500">
+                      {errors.question}
+                    </p>
                   )}
                   <p className="mt-2 text-xs sm:text-sm text-gray-600">
                     ESの質問内容をそのまま入力してください。文字数制限がある場合は併せて記載してください。
@@ -265,13 +285,18 @@ const ESCorrectionPage = () => {
                 </h2>
 
                 <div>
-                  <label htmlFor="answer" className="block text-sm sm:text-base font-semibold text-[#163300] mb-2">
+                  <label
+                    htmlFor="answer"
+                    className="block text-sm sm:text-base font-semibold text-[#163300] mb-2"
+                  >
                     あなたの回答 <span className="text-red-500">*</span>
                   </label>
                   <textarea
                     id="answer"
                     value={formData.answer}
-                    onChange={(e) => handleInputChange("answer", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("answer", e.target.value)
+                    }
                     placeholder="あなたのエントリーシートの回答を入力してください（50文字以上）"
                     rows={8}
                     className={`
@@ -284,13 +309,16 @@ const ESCorrectionPage = () => {
                     {errors.answer && (
                       <p className="text-sm text-red-500">{errors.answer}</p>
                     )}
-                    <p className={`text-sm ml-auto ${
-                      formData.answer.length >= 50 && formData.answer.length <= 2000 
-                        ? "text-[#9fe870]" 
-                        : formData.answer.length > 2000 
-                          ? "text-red-500" 
-                          : "text-gray-500"
-                    }`}>
+                    <p
+                      className={`text-sm ml-auto ${
+                        formData.answer.length >= 50 &&
+                        formData.answer.length <= 2000
+                          ? "text-[#9fe870]"
+                          : formData.answer.length > 2000
+                            ? "text-red-500"
+                            : "text-gray-500"
+                      }`}
+                    >
                       {formData.answer.length} / 50-2000文字
                     </p>
                   </div>
@@ -304,7 +332,8 @@ const ESCorrectionPage = () => {
               {usageInfo && usageInfo.remainingCorrections === 0 && (
                 <div className="bg-red-50 border border-red-200 rounded-xl p-4">
                   <p className="text-red-700 text-sm font-semibold">
-                    今月のES添削回数の上限（{usageInfo.planLimit}回）に達しました
+                    今月のES添削回数の上限（{usageInfo.planLimit}
+                    回）に達しました
                   </p>
                   <p className="text-red-600 text-xs mt-1 mb-3">
                     より多くのES添削を利用するには、プランをアップグレードしてください。
@@ -328,14 +357,31 @@ const ESCorrectionPage = () => {
               {/* Submit Button */}
               <div className="pt-4 sm:pt-5">
                 <button
-                  type={usageInfo && usageInfo.remainingCorrections === 0 ? "button" : "submit"}
-                  onClick={usageInfo && usageInfo.remainingCorrections === 0 ? () => router.push("/billing") : undefined}
-                  disabled={(!canSubmit && !(usageInfo && usageInfo.remainingCorrections === 0)) || isSubmitting || isLoadingUsage}
+                  type={
+                    usageInfo && usageInfo.remainingCorrections === 0
+                      ? "button"
+                      : "submit"
+                  }
+                  onClick={
+                    usageInfo && usageInfo.remainingCorrections === 0
+                      ? () => router.push("/billing")
+                      : undefined
+                  }
+                  disabled={
+                    (!canSubmit &&
+                      !(usageInfo && usageInfo.remainingCorrections === 0)) ||
+                    isSubmitting ||
+                    isLoadingUsage
+                  }
                   className={`
                     w-full h-12 sm:h-14 rounded-full shadow-lg transition-all duration-300 text-base sm:text-lg font-semibold
-                    ${(canSubmit || (usageInfo && usageInfo.remainingCorrections === 0)) && !isSubmitting && !isLoadingUsage
-                      ? "bg-[#9fe870] text-[#163300] hover:bg-[#8fd960] cursor-pointer"
-                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    ${
+                      (canSubmit ||
+                        (usageInfo && usageInfo.remainingCorrections === 0)) &&
+                      !isSubmitting &&
+                      !isLoadingUsage
+                        ? "bg-[#9fe870] text-[#163300] hover:bg-[#8fd960] cursor-pointer"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
                     }
                   `}
                 >
@@ -347,14 +393,18 @@ const ESCorrectionPage = () => {
                   ) : isLoadingUsage ? (
                     <div className="flex items-center justify-center gap-2">
                       <LoadingSpinner size="sm" color="#666" />
-                      <span className="text-sm sm:text-base">読み込み中...</span>
+                      <span className="text-sm sm:text-base">
+                        読み込み中...
+                      </span>
                     </div>
                   ) : usageInfo && usageInfo.remainingCorrections === 0 ? (
                     <span className="text-sm sm:text-base">
                       プランをアップグレード
                     </span>
                   ) : (
-                    <span className="text-sm sm:text-base">ES添削を開始する</span>
+                    <span className="text-sm sm:text-base">
+                      ES添削を開始する
+                    </span>
                   )}
                 </button>
               </div>
