@@ -37,21 +37,21 @@ interface DetailedFeedback {
 // Function to translate English phase names to Japanese
 const translatePhaseToJapanese = (englishPhase: string): string => {
   const phaseMap: Record<string, string> = {
-    'self_intro': '自己紹介',
-    'industry_motivation': '志望動機',
-    'gakuchika': 'ガクチカ',
-    'strength': '強み',
-    'weakness': '弱み',
-    'personality': '人柄・人間性',
-    '業界固有質問': '業界固有質問',
+    self_intro: "自己紹介",
+    industry_motivation: "志望動機",
+    gakuchika: "ガクチカ",
+    strength: "強み",
+    weakness: "弱み",
+    personality: "人柄・人間性",
+    業界固有質問: "業界固有質問",
     // Add any other mappings as needed
   };
-  
+
   // If it's already in Japanese (contains Japanese characters), return as is
   if (/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/.test(englishPhase)) {
     return englishPhase;
   }
-  
+
   return phaseMap[englishPhase] || englishPhase;
 };
 
@@ -77,13 +77,14 @@ const FeedbackPage = async ({ params }: FeedbackPageProps) => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+      <div className="max-w-7xl mx-auto px-10 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
         {/* Header */}
         <div className="text-center mb-8 sm:mb-12 lg:mb-16">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-[#163300] mb-4 sm:mb-6">
-            面接フィードバック
+          <h1 className="text-3xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-[#163300] mb-4 sm:mb-6">
+            <span className="hidden sm:inline">面接</span>
+            フィードバック
           </h1>
-          <p className="text-base sm:text-lg lg:text-xl text-gray-600 font-semibold max-w-3xl mx-auto leading-relaxed">
+          <p className="px-4 sm:px-0 text-sm sm:text-lg lg:text-xl text-gray-600 font-semibold max-w-3xl mx-auto leading-relaxed">
             あなたの面接パフォーマンスを詳しく分析し、
             <strong>具体的な改善点</strong>をお伝えします
           </p>
@@ -130,7 +131,9 @@ const FeedbackPage = async ({ params }: FeedbackPageProps) => {
                 // Ensure scores are numbers and properly formatted for 0-10 scale, multiply by 10 for better visualization
                 chartData = chartData
                   .map((item) => ({
-                    criteria: translatePhaseToJapanese(String(item.criteria || "")),
+                    criteria: translatePhaseToJapanese(
+                      String(item.criteria || "")
+                    ),
                     score: Math.max(
                       0,
                       Math.min(100, Math.round(Number(item.score) * 10 || 0))
@@ -147,7 +150,9 @@ const FeedbackPage = async ({ params }: FeedbackPageProps) => {
               ) {
                 chartData = parsedData.phaseAnalysis
                   .map((phase: any) => ({
-                    criteria: translatePhaseToJapanese(String(phase.phase || "")),
+                    criteria: translatePhaseToJapanese(
+                      String(phase.phase || "")
+                    ),
                     score: Math.max(
                       0,
                       Math.min(100, Math.round(Number(phase.score) * 10))
@@ -174,8 +179,8 @@ const FeedbackPage = async ({ params }: FeedbackPageProps) => {
           // }
 
           return overallFeedback ? (
-            <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-lg border border-gray-100 mb-6 sm:mb-8 lg:mb-10">
-              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-[#163300] mb-6 sm:mb-8 text-center">
+            <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-lg border border-gray-100 mb-4 sm:mb-8 lg:mb-10">
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-[#163300] mb-4 sm:mb-8 text-center">
                 総合評価
               </h2>
 
@@ -208,7 +213,7 @@ const FeedbackPage = async ({ params }: FeedbackPageProps) => {
 
                 {/* Right Column: Chart */}
                 <div className="flex justify-center lg:justify-start order-1 lg:order-2">
-                  <div className="w-full max-w-[300px] sm:max-w-[400px] lg:max-w-[500px]">
+                  <div className="w-full max-w-[300px] sm:max-w-[400px] lg:max-w-[500px] -mt-15 -mb-20 sm:my-0">
                     <InterviewRadarChart
                       data={chartData.length > 0 ? chartData : undefined}
                       frameless={true}
@@ -239,7 +244,7 @@ const FeedbackPage = async ({ params }: FeedbackPageProps) => {
               ) {
                 phaseAnalysis = parsedData.phaseAnalysis.map((phase: any) => ({
                   ...phase,
-                  phase: translatePhaseToJapanese(phase.phase)
+                  phase: translatePhaseToJapanese(phase.phase),
                 }));
               }
             } catch (error) {
@@ -251,8 +256,8 @@ const FeedbackPage = async ({ params }: FeedbackPageProps) => {
           }
 
           return phaseAnalysis.length > 0 ? (
-            <div className="bg-white rounded-3xl p-10 shadow-lg border border-gray-100 mb-10">
-              <h2 className="text-3xl font-bold text-[#163300] mb-10 text-center">
+            <div className="bg-white rounded-3xl p-10 shadow-lg border border-gray-100 mb-10 mt-10 sm:mt-0">
+              <h2 className="text-lg sm:text-3xl font-bold text-[#163300] mb-10 text-center">
                 フェーズ別フィードバック
               </h2>
               <div className="grid md:grid-cols-2 gap-6">
@@ -262,7 +267,7 @@ const FeedbackPage = async ({ params }: FeedbackPageProps) => {
                     className="p-6 rounded-xl border border-gray-200 bg-gray-50 hover:shadow-md transition-all duration-300"
                   >
                     <div className="flex items-start justify-between gap-4 mb-4">
-                      <h3 className="text-lg font-semibold text-[#163300]">
+                      <h3 className="text-base sm:text-lg font-semibold text-[#163300]">
                         {phase.phase}
                       </h3>
                       <div className="flex items-end gap-1">
@@ -280,8 +285,8 @@ const FeedbackPage = async ({ params }: FeedbackPageProps) => {
                           phase.score >= 8
                             ? "bg-[#9fe870]" // Green for high scores (8-10)
                             : phase.score >= 5
-                            ? "bg-[#fbbf24]" // Yellow for medium scores (5-7.9)
-                            : "bg-[#f97316]" // Orange for low scores (0-4.9)
+                              ? "bg-[#fbbf24]" // Yellow for medium scores (5-7.9)
+                              : "bg-[#f97316]" // Orange for low scores (0-4.9)
                         }`}
                         style={{
                           width: `${
@@ -358,7 +363,7 @@ const FeedbackPage = async ({ params }: FeedbackPageProps) => {
 
           return improvements.length > 0 || strengths.length > 0 ? (
             <div className="bg-white rounded-3xl p-10 shadow-lg border border-gray-100 mb-10">
-              <h2 className="text-3xl font-bold text-[#163300] mb-10 text-center">
+              <h2 className="text-lg sm:text-3xl font-bold text-[#163300] mb-10 text-center">
                 改善点 & 強みハイライト
               </h2>
 
@@ -366,7 +371,7 @@ const FeedbackPage = async ({ params }: FeedbackPageProps) => {
                 {/* 改善点 */}
                 {improvements.length > 0 && (
                   <div className="space-y-6">
-                    <h3 className="text-xl font-semibold text-[#163300] flex items-center gap-3">
+                    <h3 className="text-base sm:text-xl font-semibold text-[#163300] flex items-center gap-3">
                       <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
                         <svg
                           className="w-5 h-5 text-orange-600"
@@ -400,7 +405,7 @@ const FeedbackPage = async ({ params }: FeedbackPageProps) => {
                 {/* 強みハイライト */}
                 {strengths.length > 0 && (
                   <div className="space-y-6">
-                    <h3 className="text-xl font-semibold text-[#163300] flex items-center gap-3">
+                    <h3 className="text-base sm:text-xl font-semibold text-[#163300] flex items-center gap-3">
                       <div className="w-8 h-8 bg-[#9fe870]/20 rounded-full flex items-center justify-center">
                         <svg
                           className="w-5 h-5 text-[#163300]"
