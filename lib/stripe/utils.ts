@@ -398,24 +398,44 @@ export async function cancelSubscription() {
 
 // Get subscription info for a user
 export async function getUserSubscriptionInfo(userId?: string) {
+  console.log('🔍 Getting user subscription info...')
+  
   try {
     const { userId: currentUserId } = await auth()
     const targetUserId = userId || currentUserId
+    console.log('👤 Target user ID:', targetUserId)
 
     if (!targetUserId) {
+      console.error('❌ No user ID provided')
       throw new Error('User not authenticated')
     }
 
     const profile = await getUserProfile(targetUserId)
+    console.log('📋 User profile loaded:', {
+      exists: !!profile,
+      plan: profile?.plan,
+      stripeCustomerId: profile?.stripe_customer_id?.substring(0, 10) + '...',
+      subscriptionId: profile?.subscription_id?.substring(0, 10) + '...'
+    })
+    
     if (!profile) {
+      console.error('❌ User profile not found')
       throw new Error('User profile not found')
     }
 
     let subscriptionInfo = null
     
+    // Only try to fetch Stripe subscription if we have both customer ID and subscription ID
     if (profile.stripe_customer_id && profile.subscription_id) {
+      console.log('🔍 Fetching Stripe subscription details...')
       try {
         const subscription = await stripe.subscriptions.retrieve(profile.subscription_id)
+        console.log('✅ Stripe subscription retrieved:', {
+          id: subscription.id,
+          status: subscription.status,
+          cancelAtPeriodEnd: (subscription as any).cancel_at_period_end
+        })
+        
         subscriptionInfo = {
           id: subscription.id,
           status: subscription.status,
@@ -424,35 +444,57 @@ export async function getUserSubscriptionInfo(userId?: string) {
           cancel_at_period_end: (subscription as any).cancel_at_period_end
         }
       } catch (error) {
-        console.error('Failed to fetch Stripe subscription:', error)
+        console.error('❌ Failed to fetch Stripe subscription:', error)
         // Clear invalid subscription ID from user profile
         if (error instanceof Error && error.message.includes('No such subscription')) {
-          await updateUserProfile({ subscription_id: undefined, subscription_status: undefined }, targetUserId)
+          console.log('🧹 Cleaning up invalid subscription ID from user profile')
+          try {
+            await updateUserProfile({ 
+              subscription_id: undefined, 
+              subscription_status: undefined 
+            }, targetUserId)
+            console.log('✅ Cleaned up invalid subscription data')
+          } catch (cleanupError) {
+            console.error('❌ Failed to cleanup subscription data:', cleanupError)
+          }
         }
       }
+    } else {
+      console.log('ℹ️ No Stripe customer ID or subscription ID - skipping Stripe fetch')
     }
 
-    // Get grandfathered limits information
+    // Get grandfathered limits information with error handling
     let grandfatheredInfo = null
     try {
+      console.log('🔍 Checking for grandfathered limits...')
       const effectiveLimits = await getEffectiveUserLimits(targetUserId)
+      console.log('📊 Effective limits:', {
+        interviewLimit: effectiveLimits.interview_limit,
+        esLimit: effectiveLimits.es_limit,
+        isGrandfathered: effectiveLimits.is_grandfathered,
+        planName: effectiveLimits.plan_name
+      })
       
       if (effectiveLimits.is_grandfathered) {
         grandfatheredInfo = {
           isGrandfathered: true,
-          grandfatheredPlan: effectiveLimits.plan_name,
+          grandfatheredPlan: effectiveLimits.plan_name || '上位プラン',
           expiresAt: effectiveLimits.expires_at ? new Date(effectiveLimits.expires_at) : null,
           limits: {
-            interviews: effectiveLimits.interview_limit,
-            esCorrections: effectiveLimits.es_limit
+            interviews: effectiveLimits.interview_limit || 0,
+            esCorrections: effectiveLimits.es_limit || 0
           }
         }
+        console.log('🎁 Found grandfathered limits:', grandfatheredInfo)
+      } else {
+        console.log('ℹ️ No grandfathered limits found')
       }
     } catch (error) {
-      console.error('Failed to fetch grandfathered info:', error)
+      console.error('❌ Failed to fetch grandfathered info:', error)
+      // Continue without grandfathered info rather than failing completely
     }
 
-    return {
+    const result = {
       plan: profile.plan,
       planName: PLANS[profile.plan as PlanId]?.name || 'Unknown Plan',
       subscriptionStatus: profile.subscription_status,
@@ -460,8 +502,17 @@ export async function getUserSubscriptionInfo(userId?: string) {
       stripeCustomerId: profile.stripe_customer_id,
       grandfathered: grandfatheredInfo
     }
+    
+    console.log('✅ Subscription info compiled successfully:', {
+      plan: result.plan,
+      planName: result.planName,
+      hasSubscription: !!result.subscription,
+      hasGrandfathered: !!result.grandfathered
+    })
+    
+    return result
   } catch (error) {
-    console.error('getUserSubscriptionInfo error:', error)
+    console.error('💥 getUserSubscriptionInfo error:', error)
     throw error
   }
 }

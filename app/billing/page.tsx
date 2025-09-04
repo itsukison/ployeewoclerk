@@ -62,18 +62,53 @@ export default function BillingPage() {
       return
     }
 
+    console.log('🔄 Starting cancellation process from UI...')
     setCancelLoading(true)
     setError(null)
     setSuccessMessage(null)
 
     try {
-      await cancelSubscription()
+      console.log('📞 Calling cancelSubscription API...')
+      const result = await cancelSubscription()
+      console.log('✅ Cancel subscription API response:', result)
+      
+      // Add a small delay to allow any webhooks to process
+      console.log('⏳ Waiting for system sync...')
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      
       // Reload subscription info to reflect changes
+      console.log('🔄 Reloading subscription info...')
       await loadSubscriptionInfo()
+      
       setSuccessMessage('キャンセルが完了しました。フリープランに戻りました。')
+      console.log('🎉 Cancellation completed successfully from UI')
     } catch (error: any) {
-      console.error('Cancel subscription error:', error)
-      setError(error.message || 'サブスクリプションのキャンセルに失敗しました')
+      console.error('💥 Cancel subscription error in UI:', error)
+      
+      // Provide more helpful error messages
+      let errorMessage = 'サブスクリプションのキャンセルに失敗しました'
+      
+      if (error.message) {
+        if (error.message.includes('No active subscription')) {
+          errorMessage = 'アクティブなサブスクリプションが見つかりません。既にキャンセル済みの可能性があります。'
+        } else if (error.message.includes('authentication')) {
+          errorMessage = '認証エラーが発生しました。再度ログインしてお試しください。'
+        } else if (error.message.includes('network') || error.message.includes('fetch')) {
+          errorMessage = 'ネットワークエラーが発生しました。接続を確認してお試しください。'
+        } else {
+          errorMessage = `エラー: ${error.message}`
+        }
+      }
+      
+      setError(errorMessage)
+      
+      // Try to reload subscription info anyway to check current state
+      try {
+        console.log('🔄 Attempting to reload subscription info after error...')
+        await loadSubscriptionInfo()
+      } catch (reloadError) {
+        console.error('❌ Failed to reload subscription info after error:', reloadError)
+      }
     } finally {
       setCancelLoading(false)
     }
