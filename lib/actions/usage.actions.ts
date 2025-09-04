@@ -224,7 +224,7 @@ export async function getCurrentESUsage(): Promise<number> {
 }
 
 /**
- * Get user's plan name based on Supabase user plan
+ * Get user's plan name based on effective limits (includes grandfathered limits)
  * @returns string representing the plan name
  */
 export async function getUserPlanName(): Promise<string> {
@@ -232,7 +232,7 @@ export async function getUserPlanName(): Promise<string> {
     const { userId } = await auth();
     if (!userId) return 'フリープラン'; // Return default for unauthenticated users
     
-    const limits = await getUserPlanLimits();
+    const limits = await getEffectiveUserLimits();
     return limits.plan_name;
   } catch (error) {
     console.error('Error getting user plan name:', error);

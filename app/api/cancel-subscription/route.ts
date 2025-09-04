@@ -62,24 +62,57 @@ export async function POST(request: NextRequest) {
     })
 
     if (subscriptions.data.length === 0) {
-      console.log('⚠️ No active subscriptions found - updating user to free plan')
+      console.log('⚠️ No active subscriptions found - checking if user needs to be updated to free plan')
       
-      // Update user to free plan even if no active subscription
-      try {
-        await updateUserProfile({
-          plan: 'free',
-          subscription_status: 'canceled',
-          subscription_id: undefined
-        }, userId)
-        console.log('✅ Updated user to free plan')
-      } catch (updateError) {
-        console.error('❌ Failed to update user plan:', updateError)
+      // Check if user is still on a paid plan in the database
+      if (currentUserPlan === 'basic' || currentUserPlan === 'premium') {
+        console.log('🔄 User is on paid plan in database but no active Stripe subscription - syncing to free plan')
+        
+        // Create grandfathered limits first
+        try {
+          const { error: rpcError } = await supabaseAdmin.rpc('create_grandfathered_limit', {
+            target_user_id: userId,
+            previous_plan: currentUserPlan
+          })
+
+          if (rpcError) {
+            console.error('❌ Failed to create grandfathered limit:', rpcError)
+          } else {
+            console.log(`✅ Created grandfathered limits for ${currentUserPlan} plan`)
+          }
+        } catch (rpcError) {
+          console.error('❌ Error calling create_grandfathered_limit RPC:', rpcError)
+        }
+        
+        // Update user to free plan
+        try {
+          await updateUserProfile({
+            plan: 'free',
+            subscription_status: 'canceled',
+            subscription_id: undefined
+          }, userId)
+          console.log('✅ Synced user to free plan')
+          
+          return NextResponse.json({
+            success: true,
+            message: 'Successfully cancelled and moved to free plan',
+            cancelledSubscriptions: 0,
+            previousPlan: currentUserPlan,
+            note: 'No active Stripe subscription found but database was synced'
+          })
+        } catch (updateError) {
+          console.error('❌ Failed to update user plan:', updateError)
+          return NextResponse.json({
+            error: 'Failed to sync account to free plan'
+          }, { status: 500 })
+        }
+      } else {
+        console.log('ℹ️ User is already on free plan - no action needed')
+        return NextResponse.json({
+          success: true,
+          message: 'Already on free plan - no active subscription to cancel'
+        })
       }
-      
-      return NextResponse.json({
-        success: true,
-        message: 'Already on free plan - no active subscription to cancel'
-      })
     }
 
     // Step 5: Cancel all active subscriptions
