@@ -20,13 +20,17 @@ export async function POST(request: NextRequest) {
     }
 
     // Step 2: Get user profile
-    console.log('🔍 Fetching user profile...')
+    console.log('🔍 Fetching user profile for userId:', userId)
     const profile = await getUserProfile(userId)
-    console.log('📋 User profile:', {
+    console.log('📋 Full User profile:', profile)
+    console.log('📋 User profile summary:', {
       exists: !!profile,
+      id: profile?.id,
+      email: profile?.email,
       plan: profile?.plan,
       stripeCustomerId: profile?.stripe_customer_id,
-      subscriptionId: profile?.subscription_id
+      subscriptionId: profile?.subscription_id,
+      subscriptionStatus: profile?.subscription_status
     })
     
     if (!profile) {
