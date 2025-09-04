@@ -22,29 +22,31 @@ export function PlanAndUsageWidgets({
   planLimitES,
   currentUsageInterviews,
   currentUsageES,
-  loading = false
+  loading = false,
 }: PlanAndUsageWidgetsProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {/* Free Plan Widget */}
-      <FreePlanWidget 
+      <FreePlanWidget
         planName={planName}
         remainingInterviews={remainingInterviews}
         remainingES={remainingES}
-        loading={loading} 
+        loading={loading}
       />
 
       {/* Usage Status Widget */}
-      <UsageStatusWidget
-        planName={planName}
-        remainingInterviews={remainingInterviews}
-        remainingES={remainingES}
-        planLimitInterviews={planLimitInterviews}
-        planLimitES={planLimitES}
-        currentUsageInterviews={currentUsageInterviews}
-        currentUsageES={currentUsageES}
-        loading={loading}
-      />
+      <div className="hidden sm:block">
+        <UsageStatusWidget
+          planName={planName}
+          remainingInterviews={remainingInterviews}
+          remainingES={remainingES}
+          planLimitInterviews={planLimitInterviews}
+          planLimitES={planLimitES}
+          currentUsageInterviews={currentUsageInterviews}
+          currentUsageES={currentUsageES}
+          loading={loading}
+        />
+      </div>
     </div>
   );
 }
