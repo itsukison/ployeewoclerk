@@ -229,9 +229,40 @@ export default function BillingPage() {
                 <LoadingSpinner size="lg" color="#163300" />
               </div>
             ) : (
-              <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-                {/* Free Plan */}
-                <div className="bg-white rounded-2xl p-8 border border-gray-200 hover:border-gray-300 transition-all flex flex-col">
+              <div>
+                {/* Usage Cycle Information */}
+                <div className="max-w-4xl mx-auto mb-12 bg-blue-50 border border-blue-200 rounded-xl p-6">
+                  <h3 className="text-lg font-semibold text-blue-900 mb-4">💡 利用サイクルについて</h3>
+                  <div className="space-y-3 text-sm text-blue-800">
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <h4 className="font-semibold text-green-700 mb-2">🔼 アップグレード時</h4>
+                        <ul className="space-y-1 text-green-700">
+                          <li>• 即座にプラン変更が適用されます</li>
+                          <li>• 利用回数がリセットされます</li>
+                          <li>• 請求サイクルが変更日からリスタートします</li>
+                        </ul>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-orange-700 mb-2">🔽 ダウングレード時</h4>
+                        <ul className="space-y-1 text-orange-700">
+                          <li>• 現在の請求期間終了まで上位プランを継続</li>
+                          <li>• 現在の利用回数が保持されます</li>
+                          <li>• 次回更新日から新プランに切り替わります</li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div className="mt-4 p-3 bg-blue-100 rounded-lg">
+                      <p className="text-blue-900 text-xs">
+                        <strong>例:</strong> 8月5日にベーシックプランに登録 → 8月20日にプレミアムへアップグレード → 利用回数リセット、次回更新は9月20日
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                  {/* Free Plan */}
+                  <div className="bg-white rounded-2xl p-8 border border-gray-200 hover:border-gray-300 transition-all flex flex-col">
                   <div className="text-center mb-6">
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">フリープラン</h3>
                     <div className="text-3xl font-bold text-gray-900 mb-1">¥0</div>
@@ -403,6 +434,7 @@ export default function BillingPage() {
                       />
                     )}
                   </div>
+                </div>
                 </div>
               </div>
             )}

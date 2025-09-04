@@ -4,6 +4,7 @@ import { stripe, STRIPE_CONFIG, SERVER_PLANS, PlanId } from './config'
 import { PLANS } from './plans'
 import { getUserProfile, updateUserProfile, updateUserSubscription, getEffectiveUserLimits } from '../supabase/auth'
 import { auth } from '../supabase/auth'
+import { supabaseAdmin } from '../supabase/client'
 
 export interface CreateCheckoutSessionParams {
   planId: PlanId
@@ -92,32 +93,8 @@ export async function createCheckoutSession({
       }
     }
 
-    // Check for existing active subscriptions and cancel them to prevent multiple subscriptions
-    try {
-      const existingSubscriptions = await stripe.subscriptions.list({
-        customer: customerId,
-        status: 'active'
-      })
-
-      if (existingSubscriptions.data.length > 0) {
-        console.log(`Found ${existingSubscriptions.data.length} existing active subscription(s) for customer ${customerId}`)
-        
-        // Cancel existing subscriptions to prevent multiple billing
-        const cancelPromises = existingSubscriptions.data.map(subscription => {
-          console.log(`Cancelling existing subscription: ${subscription.id}`)
-          return stripe.subscriptions.cancel(subscription.id)
-        })
-        
-        await Promise.all(cancelPromises)
-        console.log(`Cancelled ${existingSubscriptions.data.length} existing subscription(s)`)
-      }
-    } catch (subscriptionError) {
-      console.error('Error handling existing subscriptions:', subscriptionError)
-      // Continue with checkout creation even if subscription cleanup fails
-    }
-
-    // Create checkout session
-    const session = await stripe.checkout.sessions.create({
+    // Handle existing subscriptions based on upgrade vs downgrade logic
+    let sessionConfig: any = {
       customer: customerId,
       mode: 'subscription',
       payment_method_types: ['card'],
@@ -139,7 +116,93 @@ export async function createCheckoutSession({
           planId
         }
       }
-    })
+    }
+
+    try {
+      const existingSubscriptions = await stripe.subscriptions.list({
+        customer: customerId,
+        status: 'active'
+      })
+
+      if (existingSubscriptions.data.length > 0) {
+        console.log(`Found ${existingSubscriptions.data.length} existing active subscription(s) for customer ${customerId}`)
+        
+        // Determine if this is an upgrade or downgrade
+        const currentSubscription = existingSubscriptions.data[0]
+        const currentPriceId = currentSubscription.items?.data?.[0]?.price?.id
+        const newPriceId = plan.stripePriceId
+        
+        let currentPlan: string = 'free'
+        if (currentPriceId === SERVER_PLANS.basic.stripePriceId) currentPlan = 'basic'
+        if (currentPriceId === SERVER_PLANS.premium.stripePriceId) currentPlan = 'premium'
+        
+        const planHierarchy = { free: 0, basic: 1, premium: 2 }
+        const currentPlanLevel = planHierarchy[currentPlan as keyof typeof planHierarchy] || 0
+        const newPlanLevel = planHierarchy[planId as keyof typeof planHierarchy] || 0
+        
+        const isUpgrade = newPlanLevel > currentPlanLevel
+        const isDowngrade = newPlanLevel < currentPlanLevel
+        
+        console.log(`Plan transition: ${currentPlan} → ${planId} (${isUpgrade ? 'UPGRADE' : isDowngrade ? 'DOWNGRADE' : 'SAME LEVEL'})`)
+        
+        if (isUpgrade) {
+          // UPGRADE: Cancel existing subscription immediately and start new one
+          console.log('Processing UPGRADE: cancelling existing subscription immediately')
+          const cancelPromises = existingSubscriptions.data.map(subscription => {
+            console.log(`Cancelling existing subscription for upgrade: ${subscription.id}`)
+            return stripe.subscriptions.cancel(subscription.id)
+          })
+          
+          await Promise.all(cancelPromises)
+          console.log(`Cancelled ${existingSubscriptions.data.length} existing subscription(s) for upgrade`)
+          
+        } else if (isDowngrade) {
+          // DOWNGRADE: Schedule cancellation at period end and create grandfathered limits
+          console.log('Processing DOWNGRADE: scheduling cancellation at period end')
+          
+          const periodEnd = new Date(currentSubscription.current_period_end * 1000)
+          
+          // Update existing subscription to cancel at period end
+          await stripe.subscriptions.update(currentSubscription.id, {
+            cancel_at_period_end: true
+          })
+          
+          console.log(`Scheduled existing subscription ${currentSubscription.id} to cancel at period end: ${periodEnd.toISOString()}`)
+          
+          // Create grandfathered limits for the user
+          try {
+            await supabaseAdmin.rpc('create_grandfathered_limit', {
+              target_user_id: targetUserId,
+              previous_plan: currentPlan
+            })
+            console.log(`Created grandfathered limits for user ${targetUserId} with previous plan: ${currentPlan}`)
+          } catch (grandfatheredError) {
+            console.error('Failed to create grandfathered limits:', grandfatheredError)
+            // Continue with the process even if grandfathered limits creation fails
+          }
+          
+          // Schedule the new subscription to start at the period end
+          sessionConfig.subscription_data.trial_end = currentSubscription.current_period_end
+          sessionConfig.subscription_data.proration_behavior = 'none'
+          console.log(`New subscription will start at: ${periodEnd.toISOString()}`)
+          
+        } else {
+          // SAME LEVEL: This shouldn't happen in normal flow, but handle gracefully
+          console.log('Same plan level detected - treating as renewal')
+          const cancelPromises = existingSubscriptions.data.map(subscription => {
+            console.log(`Cancelling existing subscription for renewal: ${subscription.id}`)
+            return stripe.subscriptions.cancel(subscription.id)
+          })
+          
+          await Promise.all(cancelPromises)
+        }
+      }
+    } catch (subscriptionError) {
+      console.error('Error handling existing subscriptions:', subscriptionError)
+      // Continue with checkout creation even if subscription cleanup fails
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionConfig)
 
     return { sessionId: session.id, url: session.url }
   } catch (error) {
