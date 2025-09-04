@@ -63,13 +63,37 @@ export default function BillingPage() {
     }
 
     console.log('🔄 Starting cancellation process from UI...')
+    console.log('📊 Current subscription info before cancellation:', subscriptionInfo)
     setCancelLoading(true)
     setError(null)
     setSuccessMessage(null)
 
     try {
       console.log('📞 Calling cancelSubscription API...')
-      const result = await cancelSubscription()
+      
+      // Add detailed fetch logging
+      console.log('🌐 Making fetch request to /api/cancel-subscription')
+      const response = await fetch('/api/cancel-subscription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      
+      console.log('📡 Raw fetch response:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+        url: response.url
+      })
+      
+      if (!response.ok) {
+        const errorData = await response.json()
+        console.error('❌ API returned error:', errorData)
+        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`)
+      }
+
+      const result = await response.json()
       console.log('✅ Cancel subscription API response:', result)
       
       // Add a small delay to allow any webhooks to process
@@ -84,11 +108,13 @@ export default function BillingPage() {
       console.log('🎉 Cancellation completed successfully from UI')
     } catch (error: any) {
       console.error('💥 Cancel subscription error in UI:', error)
+      console.error('💥 Error stack trace:', error.stack)
       
       // Provide more helpful error messages
       let errorMessage = 'サブスクリプションのキャンセルに失敗しました'
       
       if (error.message) {
+        console.log('🔍 Processing error message:', error.message)
         if (error.message.includes('No active subscription')) {
           errorMessage = 'アクティブなサブスクリプションが見つかりません。既にキャンセル済みの可能性があります。'
         } else if (error.message.includes('authentication')) {
@@ -100,6 +126,7 @@ export default function BillingPage() {
         }
       }
       
+      console.log('📝 Setting error message:', errorMessage)
       setError(errorMessage)
       
       // Try to reload subscription info anyway to check current state
@@ -111,6 +138,7 @@ export default function BillingPage() {
       }
     } finally {
       setCancelLoading(false)
+      console.log('🏁 Cancellation process completed (success or failure)')
     }
   }
 
@@ -236,8 +264,14 @@ export default function BillingPage() {
                       </button>
                     ) : (
                       <button 
-                        onClick={handleCancelSubscription}
+                        onClick={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          console.log('🚨 DIRECT BUTTON CLICK - bypassing any form submission')
+                          handleCancelSubscription()
+                        }}
                         disabled={cancelLoading}
+                        type="button"
                         className="w-full py-3 px-4 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg font-semibold border border-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {cancelLoading ? '処理中...' : 'フリープランに戻る'}
