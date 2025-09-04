@@ -52,7 +52,7 @@ Run the SQL schema in your Supabase SQL editor (found in `supabase/schema.sql`):
 
 **Premium Plan (プレミアムプラン)**  
 - Product name: "Premium Plan"
-- Price: ¥2000/month (or your preferred amount)
+- Price: ¥750/month (or your preferred amount)
 - Billing: Recurring monthly
 
 3. Note down the price IDs for each plan

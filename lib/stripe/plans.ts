@@ -17,19 +17,19 @@ export const PLANS = {
     currency: 'jpy',
     interval: 'month',
     features: {
-      interviews: 20,
+      interviews: 10,
       esCorrections: 20,
       support: 'priority'
     }
   },
   premium: {
     name: 'プレミアムプラン',
-    price: 2000,
+    price: 750,
     currency: 'jpy',
     interval: 'month',
     features: {
-      interviews: 999,
-      esCorrections: 999,
+      interviews: 30,
+      esCorrections: 50,
       support: '24/7'
     }
   }

@@ -103,7 +103,7 @@ export function UsageStatusWidget({
         <div className="space-y-3">
           <div>
             <div className="flex justify-between items-center mb-1">
-              <span className="text-xs font-medium text-gray-700">面接回数</span>
+              <span className="text-xs font-medium text-gray-700">面接使用回数</span>
               <span className="text-xs font-semibold text-black">
                 {maxInterviews >= 999 ? "無制限" : `${interviewsUsed} / ${maxInterviews}`}
               </span>
@@ -120,7 +120,7 @@ export function UsageStatusWidget({
           </div>
           <div>
             <div className="flex justify-between items-center mb-1">
-              <span className="text-xs font-medium text-gray-700">ES添削回数</span>
+              <span className="text-xs font-medium text-gray-700">ES添削使用回数</span>
               <span className="text-xs font-semibold text-black">
                 {maxES >= 999 ? "無制限" : `${esUsed} / ${maxES}`}
               </span>

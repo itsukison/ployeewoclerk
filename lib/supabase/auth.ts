@@ -139,7 +139,7 @@ export async function hasFeature(feature: string, userId?: string) {
     // Map features to plan capabilities
     switch (feature) {
       // Interview features
-      case 'interview_20':
+      case 'interview_30':
         return plan === 'premium'
       case 'interview_10':
         return plan === 'basic' || plan === 'premium'

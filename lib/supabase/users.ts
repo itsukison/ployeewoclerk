@@ -197,13 +197,13 @@ export function getPlanLimits(plan: UserPlan) {
   switch (plan) {
     case 'premium':
       return {
-        interviewLimit: 999,
-        esLimit: 999,
+        interviewLimit: 30,
+        esLimit: 50,
         displayName: 'プレミアムプラン'
       }
     case 'basic':
       return {
-        interviewLimit: 20,
+        interviewLimit: 10,
         esLimit: 20,
         displayName: 'ベーシックプラン'
       }

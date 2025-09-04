@@ -1,12 +1,23 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Head from "next/head";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { CheckoutButton } from "@/components/payments/CheckoutButton";
 import { PLANS } from "@/lib/stripe/plans";
+import { getUserSubscriptionInfo } from "@/lib/stripe/utils";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+
+interface SubscriptionInfo {
+  plan: string
+  planName: string
+  subscriptionStatus: string | null
+}
 
 export default function BillingPage() {
+  const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null)
+  const [loading, setLoading] = useState(true)
+
   useEffect(() => {
     document.title = "料金プラン | プロイー - AI面接練習プラットフォーム";
 
@@ -17,8 +28,21 @@ export default function BillingPage() {
         "プロイーの料金プランをご確認ください。無料プランから始めて、AI面接練習で面接スキルを向上させましょう。"
       );
     }
-  }, []);
 
+    // Load subscription info
+    const loadSubscriptionInfo = async () => {
+      try {
+        const info = await getUserSubscriptionInfo()
+        setSubscriptionInfo(info)
+      } catch (error) {
+        console.error('Failed to load subscription info:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadSubscriptionInfo()
+  }, []);
   return (
     <ProtectedRoute>
       <Head>
@@ -29,143 +53,191 @@ export default function BillingPage() {
         />
       </Head>
 
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-        <div className="max-w-7xl mx-auto px-6 py-16">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl lg:text-5xl font-bold text-slate-900 mb-4 tracking-tight">
-              料金プラン
-            </h1>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto font-light">
-              あなたの面接練習ニーズに合わせて最適なプランをお選びください
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {/* Free Plan */}
-            <div className="bg-white rounded-2xl p-8 border border-gray-200 hover:border-gray-300 transition-all">
-              <div className="text-center mb-6">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">フリープラン</h3>
-                <div className="text-3xl font-bold text-gray-900 mb-1">¥0</div>
-                <p className="text-gray-500">月額</p>
-              </div>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-center space-x-3">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-gray-600">面接練習 1回/月</span>
-                </li>
-                <li className="flex items-center space-x-3">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-gray-600">ES添削 5回/月</span>
-                </li>
-                <li className="flex items-center space-x-3">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-gray-600">基本的なフィードバック</span>
-                </li>
-              </ul>
-              <button disabled className="w-full py-3 px-4 bg-gray-100 text-gray-400 rounded-lg font-semibold cursor-not-allowed">
-                現在のプラン
-              </button>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+          <div className="max-w-7xl mx-auto px-6 py-16">
+            <div className="text-center mb-12">
+              <h1 className="text-4xl lg:text-5xl font-bold text-slate-900 mb-4 tracking-tight">
+                料金プラン
+              </h1>
+              <p className="text-lg text-slate-600 max-w-2xl mx-auto font-light">
+                あなたの面接練習ニーズに合わせて最適なプランをお選びください
+              </p>
             </div>
+            
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <LoadingSpinner size="lg" color="#163300" />
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                {/* Free Plan */}
+                <div className="bg-white rounded-2xl p-8 border border-gray-200 hover:border-gray-300 transition-all flex flex-col">
+                  <div className="text-center mb-6">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">フリープラン</h3>
+                    <div className="text-3xl font-bold text-gray-900 mb-1">¥0</div>
+                    <p className="text-gray-500">月額</p>
+                  </div>
+                  <ul className="space-y-3 mb-8 flex-grow">
+                    <li className="flex items-center space-x-3">
+                      <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-gray-600">面接練習 1回/月</span>
+                    </li>
+                    <li className="flex items-center space-x-3">
+                      <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-gray-600">ES添削 5回/月</span>
+                    </li>
+                    <li className="flex items-center space-x-3">
+                      <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-gray-600">基本的なフィードバック</span>
+                    </li>
+                  </ul>
+                  <div className="mt-auto">
+                    {subscriptionInfo?.plan === 'free' ? (
+                      <button disabled className="w-full py-3 px-4 bg-gray-100 text-gray-400 rounded-lg font-semibold cursor-not-allowed">
+                        現在のプラン
+                      </button>
+                    ) : (
+                      <button disabled className="w-full py-3 px-4 bg-gray-50 text-gray-600 rounded-lg font-semibold border border-gray-200">
+                        フリープラン
+                      </button>
+                    )}
+                  </div>
+                </div>
 
-            {/* Basic Plan */}
-            <div className="bg-white rounded-2xl p-8 border-2 border-[#9fe870] hover:border-[#8fd960] transition-all relative">
-              <div className="absolute top-4 right-4">
-                <span className="bg-[#9fe870] text-[#163300] px-3 py-1 rounded-full text-sm font-semibold">
-                  人気
-                </span>
-              </div>
-              <div className="text-center mb-6">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">ベーシックプラン</h3>
-                <div className="text-3xl font-bold text-gray-900 mb-1">¥{PLANS.basic.price.toLocaleString()}</div>
-                <p className="text-gray-500">月額</p>
-              </div>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-center space-x-3">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-gray-600">面接練習 10回/月</span>
-                </li>
-                <li className="flex items-center space-x-3">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-gray-600">ES添削 20回/月</span>
-                </li>
-                <li className="flex items-center space-x-3">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-gray-600">詳細なフィードバック</span>
-                </li>
-                <li className="flex items-center space-x-3">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-gray-600">業界別面接対策</span>
-                </li>
-              </ul>
-              <CheckoutButton 
-                planId="basic"
-                planName={PLANS.basic.name}
-                price={PLANS.basic.price}
-              />
-            </div>
+                {/* Basic Plan */}
+                <div className="bg-white rounded-2xl p-8 border-2 border-[#9fe870] hover:border-[#8fd960] transition-all relative flex flex-col">
+                  {subscriptionInfo?.plan !== 'basic' && (
+                    <div className="absolute top-4 right-4">
+                      <span className="bg-[#9fe870] text-[#163300] px-3 py-1 rounded-full text-sm font-semibold">
+                        人気
+                      </span>
+                    </div>
+                  )}
+                  {subscriptionInfo?.plan === 'basic' && (
+                    <div className="absolute top-4 right-4">
+                      <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                        現在のプラン
+                      </span>
+                    </div>
+                  )}
+                  <div className="text-center mb-6">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">ベーシックプラン</h3>
+                    <div className="text-3xl font-bold text-gray-900 mb-1">¥300</div>
+                    <p className="text-gray-500">月額</p>
+                  </div>
+                  <ul className="space-y-3 mb-8 flex-grow">
+                    <li className="flex items-center space-x-3">
+                      <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-gray-600">面接練習 <strong>10回/月</strong></span>
+                    </li>
+                    <li className="flex items-center space-x-3">
+                      <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-gray-600">ES添削 <strong>20回/月</strong></span>
+                    </li>
+                    <li className="flex items-center space-x-3">
+                      <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-gray-600">詳細なフィードバック</span>
+                    </li>
+                    <li className="flex items-center space-x-3">
+                      <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-gray-600">業界別面接対策</span>
+                    </li>
+                  </ul>
+                  <div className="mt-auto">
+                    {subscriptionInfo?.plan === 'basic' ? (
+                      <button disabled className="w-full py-3 px-4 bg-gray-100 text-gray-400 rounded-lg font-semibold cursor-not-allowed">
+                        現在のプラン
+                      </button>
+                    ) : (
+                      <CheckoutButton 
+                        planId="basic"
+                        planName={PLANS.basic.name}
+                        price={PLANS.basic.price}
+                        className="w-full"
+                      />
+                    )}
+                  </div>
+                </div>
 
-            {/* Premium Plan */}
-            <div className="bg-white rounded-2xl p-8 border border-gray-200 hover:border-gray-300 transition-all">
-              <div className="text-center mb-6">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">プレミアムプラン</h3>
-                <div className="text-3xl font-bold text-gray-900 mb-1">¥{PLANS.premium.price.toLocaleString()}</div>
-                <p className="text-gray-500">月額</p>
+                {/* Premium Plan */}
+                <div className="bg-white rounded-2xl p-8 border border-gray-200 hover:border-gray-300 transition-all relative flex flex-col">
+                  {subscriptionInfo?.plan === 'premium' && (
+                    <div className="absolute top-4 right-4">
+                      <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                        現在のプラン
+                      </span>
+                    </div>
+                  )}
+                  <div className="text-center mb-6">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">プレミアムプラン</h3>
+                    <div className="text-3xl font-bold text-gray-900 mb-1">¥2,000</div>
+                    <p className="text-gray-500">月額</p>
+                  </div>
+                  <ul className="space-y-3 mb-8 flex-grow">
+                    <li className="flex items-center space-x-3">
+                      <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-gray-600">面接練習 <strong>10回/月</strong></span>
+                    </li>
+                    <li className="flex items-center space-x-3">
+                      <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-gray-600">ES添削 <strong>50回/月</strong></span>
+                    </li>
+                    <li className="flex items-center space-x-3">
+                      <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-gray-600">AI による詳細分析</span>
+                    </li>
+                    <li className="flex items-center space-x-3">
+                      <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-gray-600">業界別面接対策</span>
+                    </li>
+                    <li className="flex items-center space-x-3">
+                      <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-gray-600">優先サポート</span>
+                    </li>
+                  </ul>
+                  <div className="mt-auto">
+                    {subscriptionInfo?.plan === 'premium' ? (
+                      <button disabled className="w-full py-3 px-4 bg-gray-100 text-gray-400 rounded-lg font-semibold cursor-not-allowed">
+                        現在のプラン
+                      </button>
+                    ) : (
+                      <CheckoutButton 
+                        planId="premium"
+                        planName={PLANS.premium.name}
+                        price={PLANS.premium.price}
+                        className="w-full"
+                      />
+                    )}
+                  </div>
+                </div>
               </div>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-center space-x-3">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-gray-600">面接練習 20回/月</span>
-                </li>
-                <li className="flex items-center space-x-3">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-gray-600">ES添削 50回/月</span>
-                </li>
-                <li className="flex items-center space-x-3">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-gray-600">AI による詳細分析</span>
-                </li>
-                 <li className="flex items-center space-x-3">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-gray-600">業界別面接対策</span>
-                </li>
-                <li className="flex items-center space-x-3">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-gray-600">優先サポート</span>
-                </li>
-              </ul>
-              <CheckoutButton 
-                planId="premium"
-                planName={PLANS.premium.name}
-                price={PLANS.premium.price}
-              />
-            </div>
+            )}
           </div>
         </div>
-      </div>
-    </ProtectedRoute>
-  );
-}
+      </ProtectedRoute>
+    );
+  }

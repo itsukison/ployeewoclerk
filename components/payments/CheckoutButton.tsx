@@ -73,7 +73,7 @@ export function CheckoutButton({
         ) : children ? (
           children
         ) : (
-          `${planName}を始める - ¥${price.toLocaleString()}/月`
+          `${planName}を始める`
         )}
       </Button>
     </div>

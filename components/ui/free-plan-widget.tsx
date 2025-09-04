@@ -30,7 +30,7 @@ export function FreePlanWidget({
 
   const getPlanPrice = (planName: string) => {
     if (planName.includes("プレミアム")) {
-      return "¥2,000/月";
+      return "¥750/月";
     } else if (planName.includes("ベーシック")) {
       return "¥500/月";
     } else {
@@ -101,13 +101,13 @@ export function FreePlanWidget({
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div className="text-center">
             <div className="font-semibold text-base text-black">
-              {remainingInterviews === 999 ? "∞" : remainingInterviews}
+              {remainingInterviews === 999 || remainingInterviews > 50 ? "∞" : remainingInterviews}
             </div>
             <div className="text-gray-600 text-xs">面接回数</div>
           </div>
           <div className="text-center">
             <div className="font-semibold text-base text-black">
-              {remainingES === 999 ? "∞" : remainingES}
+              {remainingES === 999 || remainingES > 100 ? "∞" : remainingES}
             </div>
             <div className="text-gray-600 text-xs">ES添削回数</div>
           </div>

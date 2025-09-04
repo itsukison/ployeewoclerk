@@ -77,11 +77,11 @@ BEGIN
     
     CASE user_plan
         WHEN 'premium' THEN
-            interview_limit := 999;
-            es_limit := 999;
+            interview_limit := 30;
+            es_limit := 50;
             plan_name := 'プレミアムプラン';
         WHEN 'basic' THEN
-            interview_limit := 20;
+            interview_limit := 10;
             es_limit := 20;
             plan_name := 'ベーシックプラン';
         ELSE -- 'free'
