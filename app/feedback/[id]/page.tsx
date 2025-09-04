@@ -34,6 +34,27 @@ interface DetailedFeedback {
   recommendations: string[];
 }
 
+// Function to translate English phase names to Japanese
+const translatePhaseToJapanese = (englishPhase: string): string => {
+  const phaseMap: Record<string, string> = {
+    'self_intro': '自己紹介',
+    'industry_motivation': '志望動機',
+    'gakuchika': 'ガクチカ',
+    'strength': '強み',
+    'weakness': '弱み',
+    'personality': '人柄・人間性',
+    '業界固有質問': '業界固有質問',
+    // Add any other mappings as needed
+  };
+  
+  // If it's already in Japanese (contains Japanese characters), return as is
+  if (/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/.test(englishPhase)) {
+    return englishPhase;
+  }
+  
+  return phaseMap[englishPhase] || englishPhase;
+};
+
 const FeedbackPage = async ({ params }: FeedbackPageProps) => {
   const { id } = await params;
 
@@ -109,7 +130,7 @@ const FeedbackPage = async ({ params }: FeedbackPageProps) => {
                 // Ensure scores are numbers and properly formatted for 0-10 scale, multiply by 10 for better visualization
                 chartData = chartData
                   .map((item) => ({
-                    criteria: String(item.criteria || ""),
+                    criteria: translatePhaseToJapanese(String(item.criteria || "")),
                     score: Math.max(
                       0,
                       Math.min(100, Math.round(Number(item.score) * 10 || 0))
@@ -126,7 +147,7 @@ const FeedbackPage = async ({ params }: FeedbackPageProps) => {
               ) {
                 chartData = parsedData.phaseAnalysis
                   .map((phase: any) => ({
-                    criteria: String(phase.phase || ""),
+                    criteria: translatePhaseToJapanese(String(phase.phase || "")),
                     score: Math.max(
                       0,
                       Math.min(100, Math.round(Number(phase.score) * 10))
@@ -216,7 +237,10 @@ const FeedbackPage = async ({ params }: FeedbackPageProps) => {
                 parsedData?.phaseAnalysis &&
                 Array.isArray(parsedData.phaseAnalysis)
               ) {
-                phaseAnalysis = parsedData.phaseAnalysis;
+                phaseAnalysis = parsedData.phaseAnalysis.map((phase: any) => ({
+                  ...phase,
+                  phase: translatePhaseToJapanese(phase.phase)
+                }));
               }
             } catch (error) {
               console.error(
