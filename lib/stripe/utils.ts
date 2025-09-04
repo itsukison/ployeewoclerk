@@ -2,6 +2,7 @@
 
 import { stripe, STRIPE_CONFIG, SERVER_PLANS, PlanId } from './config'
 import { PLANS } from './plans'
+import Stripe from 'stripe'
 import { getUserProfile, updateUserProfile, updateUserSubscription, getEffectiveUserLimits } from '../supabase/auth'
 import { auth } from '../supabase/auth'
 import { supabaseAdmin } from '../supabase/client'
@@ -128,7 +129,7 @@ export async function createCheckoutSession({
         console.log(`Found ${existingSubscriptions.data.length} existing active subscription(s) for customer ${customerId}`)
         
         // Determine if this is an upgrade or downgrade
-        const currentSubscription = existingSubscriptions.data[0]
+        const currentSubscription: Stripe.Subscription = existingSubscriptions.data[0]
         const currentPriceId = currentSubscription.items?.data?.[0]?.price?.id
         const newPriceId = plan.stripePriceId
         
@@ -286,7 +287,7 @@ export async function handleStripeWebhook(event: any) {
 }
 
 // Handle subscription changes
-async function handleSubscriptionChange(subscription: any) {
+async function handleSubscriptionChange(subscription: Stripe.Subscription) {
   try {
     const customerId = subscription.customer
     const subscriptionId = subscription.id
@@ -349,7 +350,7 @@ async function handleSubscriptionChange(subscription: any) {
 }
 
 // Handle subscription cancellation
-async function handleSubscriptionCancellation(subscription: any) {
+async function handleSubscriptionCancellation(subscription: Stripe.Subscription) {
   try {
     const customerId = subscription.customer
     // Set status to canceled; RPC maps canceled/inactive to free plan
