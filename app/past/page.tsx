@@ -63,22 +63,13 @@ const InterviewHistoryPage = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <AutoSignIn nonClosableModal={true}>
           <div className="mb-8">
-            <div className="flex items-start justify-between mb-6">
-              <Link
-                href="/dashboard"
-                className="px-4 py-2 text-sm font-medium text-[#163300] bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                ← ダッシュボード
-              </Link>
-              <div className="flex-1 text-center">
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#163300] mb-4">
-                  面接履歴
-                </h1>
-                <p className="text-base sm:text-lg text-gray-600">
-                  これまでの面接練習履歴を確認できます
-                </p>
-              </div>
-              <div className="w-[120px]"></div> {/* Spacer for centering */}
+            <div className="mb-6 text-center">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#163300] mb-4">
+                面接履歴
+              </h1>
+              <p className="text-base sm:text-lg text-gray-600">
+                これまでの面接練習履歴を確認できます
+              </p>
             </div>
           </div>
 
@@ -143,53 +134,55 @@ const InterviewHistoryPage = () => {
                     interview_focus?: string;
                     created_at: string;
                   }) => {
-                    const industryFocus = interview.interviewFocus || interview.interview_focus || "";
+                    const industryFocus =
+                      interview.interviewFocus ||
+                      interview.interview_focus ||
+                      "";
                     const industryLabel = getInterviewFocusLabel(industryFocus);
-                    
-                    return (
-                    <div
-                      key={interview.id}
-                      className="flex flex-col items-center"
-                    >
-                      {/* Folder Component - increased height and added padding for expansion space */}
-                      <div
-                        style={{
-                          height: "220px",
-                          position: "relative",
-                          paddingTop: "15px",
-                        }}
-                      >
-                        <Folder
-                          size={1.5}
-                          color="#9fe870"
-                          className="mx-auto"
-                          interview={interview}
-                        />
-                      </div>
 
-                      {/* Interview Details Below Folder */}
-                      <div className="text-center space-y-1 -mt-20">
-                        <h3 className="text-xl font-semibold text-[#163300]">
-                          {interview.companyName || interview.company_name}
-                        </h3>
-                        <p className="text-sm text-gray-600 font-medium">
-                          {industryLabel}
-                        </p>
-                        <div className="flex flex-col items-center space-y-1 text-sm text-gray-500">
-                          <time className="text-xs">
-                            {new Date(interview.created_at).toLocaleDateString(
-                              "ja-JP",
-                              {
+                    return (
+                      <div
+                        key={interview.id}
+                        className="flex flex-col items-center"
+                      >
+                        {/* Folder Component - increased height and added padding for expansion space */}
+                        <div
+                          style={{
+                            height: "220px",
+                            position: "relative",
+                            paddingTop: "15px",
+                          }}
+                        >
+                          <Folder
+                            size={1.5}
+                            color="#9fe870"
+                            className="mx-auto"
+                            interview={interview}
+                          />
+                        </div>
+
+                        {/* Interview Details Below Folder */}
+                        <div className="text-center space-y-1 -mt-20">
+                          <h3 className="text-xl font-semibold text-[#163300]">
+                            {interview.companyName || interview.company_name}
+                          </h3>
+                          <p className="text-sm text-gray-600 font-medium">
+                            {industryLabel}
+                          </p>
+                          <div className="flex flex-col items-center space-y-1 text-sm text-gray-500">
+                            <time className="text-xs">
+                              {new Date(
+                                interview.created_at
+                              ).toLocaleDateString("ja-JP", {
                                 year: "numeric",
                                 month: "short",
                                 day: "numeric",
-                              }
-                            )}
-                          </time>
+                              })}
+                            </time>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
+                    );
                   }
                 )}
               </div>

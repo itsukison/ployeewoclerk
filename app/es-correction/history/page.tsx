@@ -31,12 +31,14 @@ const ESHistoryPage = () => {
       try {
         setLoading(true);
         setError("");
-        
-        const response = await fetch(`/api/es-corrections?page=${currentPage}&limit=9`);
+
+        const response = await fetch(
+          `/api/es-corrections?page=${currentPage}&limit=9`
+        );
         if (!response.ok) {
           throw new Error("データの取得に失敗しました");
         }
-        
+
         const result = await response.json();
         setCorrections(result.corrections);
         setTotalPages(result.totalPages);
@@ -111,26 +113,17 @@ const ESHistoryPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white px-4 sm:px-0">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <AutoSignIn nonClosableModal={true}>
           <div className="mb-8">
-            <div className="flex items-start justify-between mb-6">
-              <button
-                onClick={() => router.push("/dashboard")}
-                className="px-4 py-2 text-sm font-medium text-[#163300] bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                ← ダッシュボード
-              </button>
-              <div className="flex-1 text-center">
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#163300] mb-4">
-                  ES添削履歴
-                </h1>
-                <p className="text-base sm:text-lg text-gray-600">
-                  これまでのエントリーシート添削履歴を確認できます
-                </p>
-              </div>
-              <div className="w-[120px]"></div> {/* Spacer for centering */}
+            <div className="mb-6 text-center">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#163300] mb-4">
+                ES添削履歴
+              </h1>
+              <p className="text-base sm:text-lg text-gray-600">
+                これまでのエントリーシート添削履歴を確認できます
+              </p>
             </div>
           </div>
 
@@ -195,78 +188,44 @@ const ESHistoryPage = () => {
                 {corrections.map((correction) => (
                   <div
                     key={correction.id}
-                    className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow"
+                    className="bg-white border border-gray-200 rounded-xl hover:shadow-md transition-shadow"
                   >
-                    {/* Header */}
-                    <div className="p-6 pb-4">
-                      <div className="flex items-start justify-between mb-3">
-                        <h3 className="text-lg font-semibold text-[#163300] line-clamp-1">
-                          {correction.company_name}
-                        </h3>
-                        {getStatusBadge(correction.status)}
-                      </div>
-                      
-                      <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                    <div className="p-6 space-y-3">
+                      <h3 className="text-lg font-semibold text-[#163300] line-clamp-1">
+                        {correction.company_name}
+                      </h3>
+                      <p className="text-sm text-gray-600 line-clamp-2">
                         {truncateText(correction.question, 80)}
                       </p>
-
                       {correction.status === "completed" && (
-                        <div className="flex items-center justify-between">
-                          <div className={`px-3 py-1 rounded-full text-sm font-semibold ${getScoreBgColor(correction.overall_score)}`}>
-                            <span className={getScoreColor(correction.overall_score)}>
-                              総合: {correction.overall_score}点
-                            </span>
-                          </div>
+                        <div className="inline-flex items-center px-3 py-1 rounded-full bg-[#9fe870]/20">
+                          <span className="text-sm font-semibold text-[#163300]">
+                            総合 {correction.overall_score} 点
+                          </span>
                         </div>
                       )}
-                    </div>
-
-                    {/* Score Details for Completed */}
-                    {correction.status === "completed" && (
-                      <div className="px-6 pb-4">
-                        <div className="grid grid-cols-3 gap-2 text-xs">
-                          <div className="text-center">
-                            <div className="text-gray-500">マッチ</div>
-                            <div className={`font-semibold ${getScoreColor(correction.match_score)}`}>
-                              {correction.match_score}
-                            </div>
-                          </div>
-                          <div className="text-center">
-                            <div className="text-gray-500">構成</div>
-                            <div className={`font-semibold ${getScoreColor(correction.structure_score)}`}>
-                              {correction.structure_score}
-                            </div>
-                          </div>
-                          <div className="text-center">
-                            <div className="text-gray-500">基本</div>
-                            <div className={`font-semibold ${getScoreColor(correction.basic_score)}`}>
-                              {correction.basic_score}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Footer */}
-                    <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between pt-2">
                         <time className="text-xs text-gray-500">
-                          {new Date(correction.created_at).toLocaleDateString("ja-JP", {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          })}
+                          {new Date(correction.created_at).toLocaleDateString(
+                            "ja-JP",
+                            {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                            }
+                          )}
                         </time>
-                        
                         {correction.status === "completed" ? (
                           <Link
                             href={`/es-correction/result/${correction.id}`}
-                            className="text-sm font-medium text-[#9fe870] hover:text-[#8fd960] transition-colors"
+                            className="text-sm font-medium text-[#163300] hover:opacity-80 transition-opacity"
                           >
                             結果を見る →
                           </Link>
                         ) : correction.status === "processing" ? (
-                          <span className="text-sm text-gray-500">処理中...</span>
+                          <span className="text-sm text-gray-500">
+                            処理中...
+                          </span>
                         ) : (
                           <span className="text-sm text-red-500">エラー</span>
                         )}
