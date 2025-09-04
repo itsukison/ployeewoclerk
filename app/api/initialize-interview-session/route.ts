@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     const initialConversationHistory = [
       {
         role: "assistant" as const,
-        content: "本日は面接にお越しいただきありがとうございます。まずは簡単に自己紹介をお願いします。",
+        content: "本日は面接にお越しいただきありがとうございます。まずは簡単にお名前、ご出身校、学生自体について自己紹介をお願いします。",
         timestamp: Date.now()
       }
     ];
