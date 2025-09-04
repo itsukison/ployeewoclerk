@@ -2,7 +2,7 @@
 
 import { stripe, STRIPE_CONFIG, SERVER_PLANS, PlanId } from './config'
 import { PLANS } from './plans'
-import { getUserProfile, updateUserSubscription } from '../supabase/auth'
+import { getUserProfile, updateUserProfile, updateUserSubscription } from '../supabase/auth'
 import { auth } from '../supabase/auth'
 
 export interface CreateCheckoutSessionParams {
