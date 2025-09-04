@@ -2,8 +2,7 @@
 
 import { stripe, STRIPE_CONFIG, SERVER_PLANS, PlanId } from './config'
 import { PLANS } from './plans'
-import { getUserProfile, updateUserProfile } from '../supabase/auth'
-import { getUserByStripeCustomerId } from '../supabase/users'
+import { getUserProfile, updateUserSubscription } from '../supabase/auth'
 import { auth } from '../supabase/auth'
 
 export interface CreateCheckoutSessionParams {
@@ -166,19 +165,15 @@ async function handleSubscriptionChange(subscription: any) {
       planId = 'premium'
     }
 
-    // Update user subscription
-    const user = await getUserByStripeCustomerId(customerId)
-    if (user) {
-      await updateUserProfile({
-        plan: planId,
-        subscription_id: subscriptionId,
-        subscription_status: mapStripeStatusToLocal(status)
-      }, user.id)
+    // Update user subscription via admin RPC to bypass RLS
+    await updateUserSubscription(
+      customerId,
+      subscriptionId,
+      mapStripeStatusToLocal(status),
+      planId
+    )
 
-      console.log(`Updated subscription for user ${user.id}: plan=${planId}, status=${status}`)
-    } else {
-      console.error('User not found for Stripe customer:', customerId)
-    }
+    console.log(`Updated subscription for customer ${customerId}: plan=${planId}, status=${status}`)
   } catch (error) {
     console.error('handleSubscriptionChange error:', error)
     throw error
@@ -189,19 +184,9 @@ async function handleSubscriptionChange(subscription: any) {
 async function handleSubscriptionCancellation(subscription: any) {
   try {
     const customerId = subscription.customer
-
-    const user = await getUserByStripeCustomerId(customerId)
-    if (user) {
-      await updateUserProfile({
-        plan: 'free',
-        subscription_status: 'canceled',
-        subscription_id: undefined
-      }, user.id)
-
-      console.log(`Cancelled subscription for user ${user.id}`)
-    } else {
-      console.error('User not found for Stripe customer:', customerId)
-    }
+    // Set status to canceled; RPC maps canceled/inactive to free plan
+    await updateUserSubscription(customerId, undefined, 'canceled')
+    console.log(`Cancelled subscription for customer ${customerId}`)
   } catch (error) {
     console.error('handleSubscriptionCancellation error:', error)
     throw error
@@ -215,14 +200,8 @@ async function handlePaymentSuccess(invoice: any) {
     const subscriptionId = invoice.subscription
 
     if (subscriptionId) {
-      const user = await getUserByStripeCustomerId(customerId)
-      if (user) {
-        await updateUserProfile({
-          subscription_status: 'active'
-        }, user.id)
-
-        console.log(`Payment succeeded for user ${user.id}`)
-      }
+      await updateUserSubscription(customerId, subscriptionId, 'active')
+      console.log(`Payment succeeded for customer ${customerId}`)
     }
   } catch (error) {
     console.error('handlePaymentSuccess error:', error)
@@ -237,14 +216,8 @@ async function handlePaymentFailure(invoice: any) {
     const subscriptionId = invoice.subscription
 
     if (subscriptionId) {
-      const user = await getUserByStripeCustomerId(customerId)
-      if (user) {
-        await updateUserProfile({
-          subscription_status: 'past_due'
-        }, user.id)
-
-        console.log(`Payment failed for user ${user.id}`)
-      }
+      await updateUserSubscription(customerId, subscriptionId, 'past_due')
+      console.log(`Payment failed for customer ${customerId}`)
     }
   } catch (error) {
     console.error('handlePaymentFailure error:', error)
