@@ -37,6 +37,14 @@ export async function createCheckoutSession({
       throw new Error(`Plan ${planId} does not have a Stripe price ID`)
     }
 
+    // Validate price ID exists in Stripe
+    try {
+      await stripe.prices.retrieve(plan.stripePriceId)
+    } catch (priceError) {
+      console.error('Invalid Stripe price ID:', plan.stripePriceId, priceError)
+      throw new Error(`Invalid price configuration for plan ${planId}`)
+    }
+
     // Create or retrieve Stripe customer
     let customerId = profile.stripe_customer_id
     
@@ -52,6 +60,23 @@ export async function createCheckoutSession({
 
       // Update user profile with Stripe customer ID
       await updateUserProfile({ stripe_customer_id: customerId }, targetUserId)
+    } else {
+      // Validate existing customer exists in Stripe
+      try {
+        await stripe.customers.retrieve(customerId)
+      } catch (customerError) {
+        console.error('Invalid Stripe customer ID:', customerId, customerError)
+        // Create new customer if old one is invalid
+        const customer = await stripe.customers.create({
+          email: profile.email,
+          name: profile.name || profile.email.split('@')[0],
+          metadata: {
+            userId: targetUserId
+          }
+        })
+        customerId = customer.id
+        await updateUserProfile({ stripe_customer_id: customerId }, targetUserId)
+      }
     }
 
     // Create checkout session
@@ -273,6 +298,10 @@ export async function getUserSubscriptionInfo(userId?: string) {
         }
       } catch (error) {
         console.error('Failed to fetch Stripe subscription:', error)
+        // Clear invalid subscription ID from user profile
+        if (error instanceof Error && error.message.includes('No such subscription')) {
+          await updateUserProfile({ subscription_id: undefined, subscription_status: undefined }, targetUserId)
+        }
       }
     }
 

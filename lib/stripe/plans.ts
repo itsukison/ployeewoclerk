@@ -13,7 +13,7 @@ export const PLANS = {
   },
   basic: {
     name: 'ベーシックプラン',
-    price: 500,
+    price: 300,
     currency: 'jpy',
     interval: 'month',
     features: {
