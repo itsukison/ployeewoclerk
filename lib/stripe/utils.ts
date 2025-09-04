@@ -92,6 +92,30 @@ export async function createCheckoutSession({
       }
     }
 
+    // Check for existing active subscriptions and cancel them to prevent multiple subscriptions
+    try {
+      const existingSubscriptions = await stripe.subscriptions.list({
+        customer: customerId,
+        status: 'active'
+      })
+
+      if (existingSubscriptions.data.length > 0) {
+        console.log(`Found ${existingSubscriptions.data.length} existing active subscription(s) for customer ${customerId}`)
+        
+        // Cancel existing subscriptions to prevent multiple billing
+        const cancelPromises = existingSubscriptions.data.map(subscription => {
+          console.log(`Cancelling existing subscription: ${subscription.id}`)
+          return stripe.subscriptions.cancel(subscription.id)
+        })
+        
+        await Promise.all(cancelPromises)
+        console.log(`Cancelled ${existingSubscriptions.data.length} existing subscription(s)`)
+      }
+    } catch (subscriptionError) {
+      console.error('Error handling existing subscriptions:', subscriptionError)
+      // Continue with checkout creation even if subscription cleanup fails
+    }
+
     // Create checkout session
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
@@ -346,6 +370,29 @@ function mapStripeStatusToLocal(stripeStatus: string): 'active' | 'inactive' | '
     case 'incomplete_expired':
     default:
       return 'inactive'
+  }
+}
+
+// Cancel user subscription
+export async function cancelSubscription() {
+  try {
+    const response = await fetch('/api/cancel-subscription', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || 'Failed to cancel subscription')
+    }
+
+    const result = await response.json()
+    return result
+  } catch (error) {
+    console.error('cancelSubscription error:', error)
+    throw error
   }
 }
 

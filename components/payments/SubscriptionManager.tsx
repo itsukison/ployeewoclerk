@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
-import { createCustomerPortalSession, getUserSubscriptionInfo } from '@/lib/stripe/utils'
+import { createCustomerPortalSession, getUserSubscriptionInfo, cancelSubscription } from '@/lib/stripe/utils'
 import { useAuth } from '@/components/auth/AuthProvider'
 
 interface SubscriptionInfo {
@@ -25,6 +25,7 @@ export function SubscriptionManager() {
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null)
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState(false)
+  const [cancelLoading, setCancelLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -67,6 +68,27 @@ export function SubscriptionManager() {
       console.error('Customer portal error:', error)
       setError(error.message || '管理ページへのアクセスに失敗しました')
       setActionLoading(false)
+    }
+  }
+
+  const handleCancelSubscription = async () => {
+    if (!confirm('本当にサブスクリプションをキャンセルしてフリープランに戻りますか？')) {
+      return
+    }
+
+    setCancelLoading(true)
+    setError(null)
+
+    try {
+      await cancelSubscription()
+      // Reload subscription info to reflect changes
+      await loadSubscriptionInfo()
+      alert('サブスクリプションがキャンセルされました。フリープランに戻りました。')
+    } catch (error: any) {
+      console.error('Cancel subscription error:', error)
+      setError(error.message || 'サブスクリプションのキャンセルに失敗しました')
+    } finally {
+      setCancelLoading(false)
     }
   }
 
@@ -172,7 +194,7 @@ export function SubscriptionManager() {
         </div>
 
         {subscriptionInfo.stripeCustomerId && (
-          <div className="mt-6 pt-4 border-t border-gray-200">
+          <div className="mt-6 pt-4 border-t border-gray-200 space-y-3">
             <Button
               onClick={handleManageSubscription}
               disabled={actionLoading}
@@ -188,7 +210,24 @@ export function SubscriptionManager() {
               )}
             </Button>
             
-            <p className="text-xs text-gray-500 text-center mt-2">
+            {subscriptionInfo.plan !== 'free' && (
+              <Button
+                onClick={handleCancelSubscription}
+                disabled={cancelLoading}
+                className="w-full h-12 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-2xl font-semibold"
+              >
+                {cancelLoading ? (
+                  <div className="flex items-center gap-2">
+                    <LoadingSpinner size="sm" color="#dc2626" />
+                    <span>処理中...</span>
+                  </div>
+                ) : (
+                  'フリープランに戻る'
+                )}
+              </Button>
+            )}
+            
+            <p className="text-xs text-gray-500 text-center">
               お支払い方法の変更、プランの変更、キャンセルなど
             </p>
           </div>

@@ -5,7 +5,7 @@ import Head from "next/head";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { CheckoutButton } from "@/components/payments/CheckoutButton";
 import { PLANS } from "@/lib/stripe/plans";
-import { getUserSubscriptionInfo } from "@/lib/stripe/utils";
+import { getUserSubscriptionInfo, cancelSubscription } from "@/lib/stripe/utils";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 interface SubscriptionInfo {
@@ -17,6 +17,8 @@ interface SubscriptionInfo {
 export default function BillingPage() {
   const [subscriptionInfo, setSubscriptionInfo] = useState<SubscriptionInfo | null>(null)
   const [loading, setLoading] = useState(true)
+  const [cancelLoading, setCancelLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     document.title = "料金プラン | プロイー - AI面接練習プラットフォーム";
@@ -43,6 +45,39 @@ export default function BillingPage() {
 
     loadSubscriptionInfo()
   }, []);
+
+  const handleCancelSubscription = async () => {
+    if (!confirm('本当にサブスクリプションをキャンセルしてフリープランに戻りますか？')) {
+      return
+    }
+
+    setCancelLoading(true)
+    setError(null)
+
+    try {
+      await cancelSubscription()
+      // Reload subscription info to reflect changes
+      await loadSubscriptionInfo()
+      alert('サブスクリプションがキャンセルされました。フリープランに戻りました。')
+    } catch (error: any) {
+      console.error('Cancel subscription error:', error)
+      setError(error.message || 'サブスクリプションのキャンセルに失敗しました')
+    } finally {
+      setCancelLoading(false)
+    }
+  }
+
+  const loadSubscriptionInfo = async () => {
+    try {
+      setLoading(true)
+      const info = await getUserSubscriptionInfo()
+      setSubscriptionInfo(info)
+    } catch (error) {
+      console.error('Failed to load subscription info:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
   return (
     <ProtectedRoute>
       <Head>
@@ -64,6 +99,12 @@ export default function BillingPage() {
               </p>
             </div>
             
+            {error && (
+              <div className="mb-8 p-4 rounded-lg bg-red-50 border border-red-200 max-w-2xl mx-auto">
+                <p className="text-sm text-red-600 text-center">{error}</p>
+              </div>
+            )}
+
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <LoadingSpinner size="lg" color="#163300" />
@@ -103,8 +144,12 @@ export default function BillingPage() {
                         現在のプラン
                       </button>
                     ) : (
-                      <button disabled className="w-full py-3 px-4 bg-gray-50 text-gray-600 rounded-lg font-semibold border border-gray-200">
-                        フリープラン
+                      <button 
+                        onClick={handleCancelSubscription}
+                        disabled={cancelLoading}
+                        className="w-full py-3 px-4 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg font-semibold border border-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {cancelLoading ? '処理中...' : 'フリープランに戻る'}
                       </button>
                     )}
                   </div>
