@@ -36,6 +36,7 @@ export function SubscriptionManager() {
   const [actionLoading, setActionLoading] = useState(false)
   const [cancelLoading, setCancelLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   useEffect(() => {
     if (user) {
@@ -87,12 +88,13 @@ export function SubscriptionManager() {
 
     setCancelLoading(true)
     setError(null)
+    setSuccessMessage(null)
 
     try {
       await cancelSubscription()
       // Reload subscription info to reflect changes
       await loadSubscriptionInfo()
-      alert('サブスクリプションがキャンセルされました。フリープランに戻りました。')
+      setSuccessMessage('キャンセルが完了しました。フリープランに戻りました。')
     } catch (error: any) {
       console.error('Cancel subscription error:', error)
       setError(error.message || 'サブスクリプションのキャンセルに失敗しました')
@@ -157,6 +159,12 @@ export function SubscriptionManager() {
         </div>
       )}
 
+      {successMessage && (
+        <div className="p-4 rounded-lg bg-green-50 border border-green-200">
+          <p className="text-sm text-green-600">{successMessage}</p>
+        </div>
+      )}
+
       <div className="p-6 rounded-2xl bg-white border border-gray-200 shadow-sm">
         <h3 className="text-xl font-bold text-[#163300] mb-4">
           現在のプラン
@@ -170,7 +178,7 @@ export function SubscriptionManager() {
             </span>
           </div>
 
-          {subscriptionInfo.grandfathered?.isGrandfathered && (
+          {subscriptionInfo.grandfathered?.isGrandfathered && subscriptionInfo.grandfathered.limits && (
             <div className="p-4 rounded-lg bg-amber-50 border border-amber-200">
               <div className="flex items-center gap-2 mb-2">
                 <svg className="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -181,15 +189,15 @@ export function SubscriptionManager() {
               <div className="space-y-1 text-xs text-amber-700">
                 <div className="flex justify-between">
                   <span>適用プラン:</span>
-                  <span className="font-medium">{subscriptionInfo.grandfathered.grandfatheredPlan}</span>
+                  <span className="font-medium">{subscriptionInfo.grandfathered.grandfatheredPlan || '上位プラン'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>面接練習:</span>
-                  <span className="font-medium">{subscriptionInfo.grandfathered.limits.interviews}回/月</span>
+                  <span className="font-medium">{subscriptionInfo.grandfathered.limits.interviews || 0}回/月</span>
                 </div>
                 <div className="flex justify-between">
                   <span>ES添削:</span>
-                  <span className="font-medium">{subscriptionInfo.grandfathered.limits.esCorrections}回/月</span>
+                  <span className="font-medium">{subscriptionInfo.grandfathered.limits.esCorrections || 0}回/月</span>
                 </div>
                 {subscriptionInfo.grandfathered.expiresAt && (
                   <div className="flex justify-between pt-1 border-t border-amber-200">

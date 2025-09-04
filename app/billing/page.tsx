@@ -28,6 +28,7 @@ export default function BillingPage() {
   const [loading, setLoading] = useState(true)
   const [cancelLoading, setCancelLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   useEffect(() => {
     document.title = "料金プラン | プロイー - AI面接練習プラットフォーム";
@@ -41,18 +42,19 @@ export default function BillingPage() {
     }
 
     // Load subscription info
-    const loadSubscriptionInfo = async () => {
+    const loadSubscriptionInfoOnMount = async () => {
       try {
         const info = await getUserSubscriptionInfo()
         setSubscriptionInfo(info)
       } catch (error) {
         console.error('Failed to load subscription info:', error)
+        setError('サブスクリプション情報の読み込みに失敗しました')
       } finally {
         setLoading(false)
       }
     }
 
-    loadSubscriptionInfo()
+    loadSubscriptionInfoOnMount()
   }, []);
 
   const handleCancelSubscription = async () => {
@@ -62,12 +64,13 @@ export default function BillingPage() {
 
     setCancelLoading(true)
     setError(null)
+    setSuccessMessage(null)
 
     try {
       await cancelSubscription()
       // Reload subscription info to reflect changes
       await loadSubscriptionInfo()
-      alert('サブスクリプションがキャンセルされました。フリープランに戻りました。')
+      setSuccessMessage('キャンセルが完了しました。フリープランに戻りました。')
     } catch (error: any) {
       console.error('Cancel subscription error:', error)
       setError(error.message || 'サブスクリプションのキャンセルに失敗しました')
@@ -79,10 +82,12 @@ export default function BillingPage() {
   const loadSubscriptionInfo = async () => {
     try {
       setLoading(true)
+      setError(null)
       const info = await getUserSubscriptionInfo()
       setSubscriptionInfo(info)
     } catch (error) {
       console.error('Failed to load subscription info:', error)
+      setError('サブスクリプション情報の読み込みに失敗しました')
     } finally {
       setLoading(false)
     }
@@ -114,7 +119,13 @@ export default function BillingPage() {
               </div>
             )}
 
-            {subscriptionInfo?.grandfathered?.isGrandfathered && (
+            {successMessage && (
+              <div className="mb-8 p-4 rounded-lg bg-green-50 border border-green-200 max-w-2xl mx-auto">
+                <p className="text-sm text-green-600 text-center">{successMessage}</p>
+              </div>
+            )}
+
+            {subscriptionInfo?.grandfathered?.isGrandfathered && subscriptionInfo.grandfathered.limits && (
               <div className="mb-8 p-6 rounded-2xl bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 max-w-2xl mx-auto">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center">
@@ -125,18 +136,18 @@ export default function BillingPage() {
                   <div>
                     <h3 className="text-lg font-semibold text-amber-800">継続特典が適用中</h3>
                     <p className="text-sm text-amber-700">
-                      {subscriptionInfo.grandfathered.grandfatheredPlan}の利用制限を継続してご利用いただけます
+                      {subscriptionInfo.grandfathered.grandfatheredPlan || '上位プラン'}の利用制限を継続してご利用いただけます
                     </p>
                   </div>
                 </div>
                 <div className="space-y-2 text-sm text-amber-700">
                   <div className="flex justify-between">
                     <span>面接練習:</span>
-                    <span className="font-semibold">{subscriptionInfo.grandfathered.limits.interviews}回/月</span>
+                    <span className="font-semibold">{subscriptionInfo.grandfathered.limits.interviews || 0}回/月</span>
                   </div>
                   <div className="flex justify-between">
                     <span>ES添削:</span>
-                    <span className="font-semibold">{subscriptionInfo.grandfathered.limits.esCorrections}回/月</span>
+                    <span className="font-semibold">{subscriptionInfo.grandfathered.limits.esCorrections || 0}回/月</span>
                   </div>
                   {subscriptionInfo.grandfathered.expiresAt && (
                     <div className="flex justify-between pt-2 border-t border-amber-200">

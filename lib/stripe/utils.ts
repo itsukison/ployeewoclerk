@@ -2,7 +2,7 @@
 
 import { stripe, STRIPE_CONFIG, SERVER_PLANS, PlanId } from './config'
 import { PLANS } from './plans'
-import { getUserProfile, updateUserProfile, updateUserSubscription } from '../supabase/auth'
+import { getUserProfile, updateUserProfile, updateUserSubscription, getEffectiveUserLimits } from '../supabase/auth'
 import { auth } from '../supabase/auth'
 
 export interface CreateCheckoutSessionParams {
@@ -435,7 +435,6 @@ export async function getUserSubscriptionInfo(userId?: string) {
     // Get grandfathered limits information
     let grandfatheredInfo = null
     try {
-      const { getEffectiveUserLimits } = await import('@/lib/supabase/auth')
       const effectiveLimits = await getEffectiveUserLimits(targetUserId)
       
       if (effectiveLimits.is_grandfathered) {
