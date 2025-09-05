@@ -7,16 +7,22 @@ export default function Contact() {
     name: "",
     email: "",
     subject: "",
-    message: ""
+    message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
+  const [submitStatus, setSubmitStatus] = useState<
+    "idle" | "success" | "error"
+  >("idle");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -42,7 +48,7 @@ export default function Contact() {
           name: "",
           email: "",
           subject: "",
-          message: ""
+          message: "",
         });
       } else {
         throw new Error(result.error || "送信に失敗しました");
@@ -60,7 +66,7 @@ export default function Contact() {
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 bg-[#2F4F3F] overflow-hidden">
         <div className="absolute inset-0 bg-[#142d25]"></div>
-        
+
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="inline-flex items-center px-4 py-2 rounded-full border border-white/20 text-white/80 text-sm font-medium backdrop-blur-sm mb-6">
@@ -97,25 +103,53 @@ export default function Contact() {
               <div className="space-y-6">
                 <div className="flex items-start space-x-4">
                   <div className="w-12 h-12 bg-[#9fe870]/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg className="w-6 h-6 text-[#163300]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    <svg
+                      className="w-6 h-6 text-[#163300]"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                      />
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-[#163300] mb-1">メールサポート</h3>
-                    <p className="text-gray-600">ployee.officialcontact@gmail.com</p>
-                    <p className="text-sm text-gray-500">24時間以内に返信いたします</p>
+                    <h3 className="font-semibold text-[#163300] mb-1">
+                      メールサポート
+                    </h3>
+                    <p className="text-gray-600">
+                      ployee.officialcontact@gmail.com
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      24時間以内に返信いたします
+                    </p>
                   </div>
                 </div>
 
                 <div className="flex items-start space-x-4">
                   <div className="w-12 h-12 bg-[#9fe870]/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg className="w-6 h-6 text-[#163300]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <svg
+                      className="w-6 h-6 text-[#163300]"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-[#163300] mb-1">対応時間</h3>
+                    <h3 className="font-semibold text-[#163300] mb-1">
+                      対応時間
+                    </h3>
                     <p className="text-gray-600">月〜金: 9:00 - 18:00</p>
                     <p className="text-sm text-gray-500">日本標準時（JST）</p>
                   </div>
@@ -123,13 +157,27 @@ export default function Contact() {
 
                 <div className="flex items-start space-x-4">
                   <div className="w-12 h-12 bg-[#9fe870]/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg className="w-6 h-6 text-[#163300]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <svg
+                      className="w-6 h-6 text-[#163300]"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-[#163300] mb-1">よくある質問</h3>
-                    <p className="text-gray-600">基本的な質問は料金ページのFAQをご確認ください</p>
+                    <h3 className="font-semibold text-[#163300] mb-1">
+                      よくある質問
+                    </h3>
+                    <p className="text-gray-600">
+                      基本的な質問は料金ページのFAQをご確認ください
+                    </p>
                   </div>
                 </div>
               </div>
@@ -159,7 +207,10 @@ export default function Contact() {
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     お名前 *
                   </label>
                   <input
@@ -175,7 +226,10 @@ export default function Contact() {
                 </div>
 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     メールアドレス *
                   </label>
                   <input
@@ -191,7 +245,10 @@ export default function Contact() {
                 </div>
 
                 <div>
-                  <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="subject"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     お問い合わせ種別 *
                   </label>
                   <select
@@ -204,15 +261,22 @@ export default function Contact() {
                   >
                     <option value="">選択してください</option>
                     <option value="技術的な問題">技術的な問題</option>
-                    <option value="料金・プランについて">料金・プランについて</option>
+                    <option value="料金・プランについて">
+                      料金・プランについて
+                    </option>
                     <option value="機能に関する質問">機能に関する質問</option>
-                    <option value="企業向けソリューション">企業向けソリューション</option>
+                    <option value="企業向けソリューション">
+                      企業向けソリューション
+                    </option>
                     <option value="その他">その他</option>
                   </select>
                 </div>
 
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="message"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     メッセージ *
                   </label>
                   <textarea
@@ -258,7 +322,7 @@ export default function Contact() {
                 面接練習の回数制限はありますか？
               </h3>
               <p className="text-gray-600">
-                無料プランでは月3回まで、プロプランでは無制限でご利用いただけます。
+                無料プランでは月1回まで、プロプランでは月30回ご利用いただけます。
               </p>
             </div>
 
@@ -287,6 +351,41 @@ export default function Contact() {
               <p className="text-gray-600">
                 はい、企業向けのソリューションもご用意しています。カスタマイズ可能な面接システムや、採用プロセスの効率化をサポートします。詳しくはお問い合わせください。
               </p>
+            </div>
+
+            <div className="bg-white rounded-2xl p-6 shadow-sm">
+              <h3 className="font-semibold text-[#163300] mb-2">
+                料金プランの利用サイクルはどのように機能しますか？
+              </h3>
+              <div className="space-y-4 text-gray-800">
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-2">
+                    🔼 アップグレード時
+                  </h4>
+                  <ul className="space-y-1 text-gray-700 ml-4">
+                    <li>• 即座にプラン変更が適用されます</li>
+                    <li>• 利用回数がリセットされます</li>
+                    <li>• 請求サイクルが変更日からリスタートします</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-2">
+                    🔽 ダウングレード時
+                  </h4>
+                  <ul className="space-y-1 text-gray-700 ml-4">
+                    <li>• 現在の請求期間終了まで上位プランを継続</li>
+                    <li>• 現在の利用回数が保持されます</li>
+                    <li>• 次回更新日から新プランに切り替わります</li>
+                  </ul>
+                </div>
+                <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                  <p className="text-gray-800 text-sm">
+                    <strong>例:</strong> 8月5日にベーシックプランに登録 →
+                    8月20日にプレミアムへアップグレード →
+                    利用回数リセット、次回更新は9月20日
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
