@@ -328,6 +328,12 @@ const DashboardPage = () => {
                   >
                     プライバシーポリシー
                   </a>
+                  <a
+                    href="/commercial-transactions"
+                    className="text-sm text-gray-600 hover:text-[#163300] transition-colors duration-200"
+                  >
+                    特定商取引法に基づく表記
+                  </a>
                 </div>
               </div>
             </div>

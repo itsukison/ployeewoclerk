@@ -45,6 +45,12 @@ export default function SitemapPage() {
       url: "/past",
       description: "これまでの面接練習の記録とフィードバックを確認。",
     },
+    {
+      title: "特定商取引法に基づく表記",
+      url: "/commercial-transactions",
+      description:
+        "プロイーの特定商取引法に基づく表記ページ。販売事業者情報、料金、支払方法などをご確認いただけます。",
+    },
   ];
 
   return (

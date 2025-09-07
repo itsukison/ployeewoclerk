@@ -821,16 +821,22 @@ export default function StaticContent() {
                 {/* Legal Links */}
                 <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-6 text-xs sm:text-sm text-center">
                   <a
-                    href="#"
+                    href="/terms"
                     className="text-gray-400 hover:text-white transition-colors"
                   >
                     利用規約
                   </a>
                   <a
-                    href="#"
+                    href="/privacy"
                     className="text-gray-400 hover:text-white transition-colors"
                   >
                     プライバシーポリシー
+                  </a>
+                  <a
+                    href="/commercial-transactions"
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
+                    特定商取引法に基づく表記
                   </a>
                   <p className="text-gray-400">
                     © 2025 プロイー. All rights reserved.
