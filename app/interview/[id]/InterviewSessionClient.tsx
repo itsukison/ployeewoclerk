@@ -54,6 +54,8 @@ const InterviewSessionClient = ({ interview }: InterviewSessionClientProps) => {
     isPlayingTTS,
     conversationHistory,
     isMuted,
+    interviewPhase,
+    workflowState,
     toggleRecording,
     toggleMute,
     generateFeedbackAndRedirect,
@@ -67,6 +69,39 @@ const InterviewSessionClient = ({ interview }: InterviewSessionClientProps) => {
       }
     }
     return null;
+  };
+
+  // Calculate progress based on current phase
+  const getInterviewProgress = () => {
+    // 5 total phases: self_intro, industry_motivation, gakuchika, random_base_q, random_industry_q
+    const knownPhases = ["self_intro", "industry_motivation", "gakuchika"];
+    const currentPhaseIndex = knownPhases.indexOf(interviewPhase);
+
+    // If interview is finished
+    if (workflowState.finished) {
+      return 100;
+    }
+
+    // Count user messages to estimate overall progress
+    const userMessages = conversationHistory.filter(
+      (msg) => msg.role === "user"
+    ).length;
+
+    // For known phases (first 3 phases)
+    if (currentPhaseIndex !== -1) {
+      // Each of the first 3 phases represents 20% of progress
+      return Math.min((currentPhaseIndex + 1) * 20, 60);
+    }
+
+    // For phases 4 and 5 (random questions), estimate based on user message count
+    if (userMessages >= 3) {
+      // Phase 4: 60-80%, Phase 5: 80-100%
+      const additionalProgress = Math.min((userMessages - 3) * 20, 40);
+      return Math.min(60 + additionalProgress, 100);
+    }
+
+    // Default fallback based on conversation length
+    return Math.min(userMessages * 15, 80);
   };
 
   useEffect(() => {
@@ -97,7 +132,8 @@ const InterviewSessionClient = ({ interview }: InterviewSessionClientProps) => {
   const companyName =
     interview.company_name || interview.companyName || "AI面接官";
 
-  const industryFocus = interview.interviewFocus || interview.interview_focus || "";
+  const industryFocus =
+    interview.interviewFocus || interview.interview_focus || "";
   const industryLabel = getInterviewFocusLabel(industryFocus);
 
   return (
@@ -108,12 +144,22 @@ const InterviewSessionClient = ({ interview }: InterviewSessionClientProps) => {
             {companyName}
           </h1>
           <p className="text-xl text-gray-600 mb-3">{industryLabel}</p>
+
+          {/* Progress Bar */}
+          <div className="max-w-md mx-auto mt-2 mb-6">
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div
+                className="bg-[#9fe870] h-2 rounded-full transition-all duration-500 ease-out"
+                style={{ width: `${isActive ? getInterviewProgress() : 0}%` }}
+              />
+            </div>
+          </div>
         </div>
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center px-2 overflow-hidden">
         <div className="w-full max-w-5xl h-full flex flex-col justify-center space-y-3">
-          <div className="flex justify-center flex-shrink-0 -mt-20">
+          <div className="flex justify-center flex-shrink-0 -mt-16">
             <div
               ref={lottieRef}
               className={`w-80 h-80 transition-opacity duration-300 ${
@@ -164,8 +210,8 @@ const InterviewSessionClient = ({ interview }: InterviewSessionClientProps) => {
                       isProcessing
                         ? "bg-gray-300 text-gray-600 cursor-not-allowed"
                         : isMuted
-                        ? "bg-[#9fe870] text-[#163300] hover:bg-[#8fd960] cursor-pointer"
-                        : "bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer"
+                          ? "bg-[#9fe870] text-[#163300] hover:bg-[#8fd960] cursor-pointer"
+                          : "bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer"
                     }`}
                   >
                     {isProcessing ? (

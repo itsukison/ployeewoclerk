@@ -33,12 +33,10 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 const formSchema = z.object({
   name: z.string().min(1, {
-    message: "お名前を入力してください",
+    message: "お名前を入力してください（ニックネーム可）",
   }),
 
-  education: z.string().min(1, {
-    message: "学歴を入力してください",
-  }),
+  education: z.string().optional(),
 
   companyName: z.string().min(1, {
     message: "会社名を入力してください",
@@ -136,34 +134,52 @@ export function InterviewForm() {
       const authCheck = await verifyAuth();
       console.log("Server-side auth check:", authCheck);
       if (!authCheck.isAuthenticated) {
-        console.error("Server-side authentication verification failed:", authCheck.error);
-        console.error("Client user ID:", user.id, "Server user ID:", authCheck.userId);
-        
+        console.error(
+          "Server-side authentication verification failed:",
+          authCheck.error
+        );
+        console.error(
+          "Client user ID:",
+          user.id,
+          "Server user ID:",
+          authCheck.userId
+        );
+
         // Try to refresh the session to sync client and server
         try {
-          console.log("Attempting to refresh session to sync authentication...");
-          const { supabase } = await import('@/lib/supabase/browser');
-          
+          console.log(
+            "Attempting to refresh session to sync authentication..."
+          );
+          const { supabase } = await import("@/lib/supabase/browser");
+
           // Force refresh the session to update cookies
-          const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
-          
+          const { data: refreshData, error: refreshError } =
+            await supabase.auth.refreshSession();
+
           if (refreshError) {
             console.error("Session refresh failed:", refreshError);
           } else {
-            console.log("Session refreshed successfully", refreshData.session?.user?.id);
-            
+            console.log(
+              "Session refreshed successfully",
+              refreshData.session?.user?.id
+            );
+
             // Wait a moment for cookies to be set
-            await new Promise(resolve => setTimeout(resolve, 500));
-            
+            await new Promise((resolve) => setTimeout(resolve, 500));
+
             console.log("Retrying auth verification after session refresh...");
             const retryAuthCheck = await verifyAuth();
             console.log("Retry auth check result:", retryAuthCheck);
-            
+
             if (retryAuthCheck.isAuthenticated) {
-              console.log("Authentication verified after session refresh, continuing...");
+              console.log(
+                "Authentication verified after session refresh, continuing..."
+              );
               // Continue with the interview creation by not returning here
             } else {
-              console.error("Authentication still failed after session refresh");
+              console.error(
+                "Authentication still failed after session refresh"
+              );
               setShowAuthModal(true);
               setIsSubmitting(false);
               return;
@@ -179,18 +195,27 @@ export function InterviewForm() {
 
       // Call createInterview with new auth-tolerant handling
       const result = await createInterview(values);
-      
+
       if (!result.ok) {
         if (result.code === "UNAUTHENTICATED") {
-          console.error("Authentication failed during interview creation despite verification");
+          console.error(
+            "Authentication failed during interview creation despite verification"
+          );
           console.error("This indicates a possible session/cookie sync issue");
-          console.error("Client user:", user?.id, "Server verification passed:", authCheck.isAuthenticated);
+          console.error(
+            "Client user:",
+            user?.id,
+            "Server verification passed:",
+            authCheck.isAuthenticated
+          );
           setShowAuthModal(true);
           setIsSubmitting(false);
           return;
         } else if (result.code === "DB_ERROR") {
           console.error("Database error:", result.message);
-          alert(`エラーが発生しました: ${result.message || 'データベースエラー'}`);
+          alert(
+            `エラーが発生しました: ${result.message || "データベースエラー"}`
+          );
           setIsSubmitting(false);
           return;
         } else if (result.code === "USAGE_LIMIT_EXCEEDED") {
@@ -200,7 +225,7 @@ export function InterviewForm() {
           return;
         }
       }
-      
+
       // Success case
       if (result.ok && result.interview) {
         router.push(`/interview/${result.interview.id}`);
@@ -277,11 +302,11 @@ export function InterviewForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-sm sm:text-base font-semibold text-[#163300]">
-                      学歴 <span className="text-red-500">*</span>
+                      学歴
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="例: 東京大学工学部卒業"
+                        placeholder="例: 東京大学工学部卒業（任意）"
                         className="h-10 sm:h-12 text-sm sm:text-base"
                         {...field}
                       />

@@ -810,6 +810,7 @@ export function useInterviewSession(interviewId?: string) {
     interviewPhase,
     candidateInfo,
     isMuted,
+    workflowState,
     
     // Usage tracking is now handled server-side via interview count
     
