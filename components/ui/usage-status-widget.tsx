@@ -125,8 +125,8 @@ export function UsageStatusWidget({
                   <Button 
                     variant="default" 
                     size="sm" 
-                    className="bg-[rgba(159,232,112,0.8)] text-[#163300] backdrop-blur-sm border border-[rgba(255,255,255,0.3)] shadow-sm hover:bg-[rgba(159,232,112,1)] hover:shadow-[0_0_10px_rgba(159,232,112,0.5)] transition-all duration-300 rounded-full text-xs px-3 py-1 w-full"
-                  >
+                    className="bg-[rgba(255,100,100,0.7)] text-white backdrop-blur-sm border border-[rgba(255,255,255,0.3)] shadow-sm hover:bg-[rgba(255,100,100,0.9)] hover:shadow-[0_0_10px_rgba(255,0,0,0.5)] transition-all duration-300 rounded-full text-xs px-3 py-1 w-full"
+                    >
                     <span>もっと練習して、自信をつけよう！</span>
                     <ArrowRight className="h-3 w-3 ml-1" />
                   </Button>
@@ -145,7 +145,7 @@ export function UsageStatusWidget({
               <div
                 className="h-1.5 rounded-full transition-all duration-300"
                 style={{
-                  backgroundColor: "rgba(255,100,100,0.7)",
+                  backgroundColor: "#9fe870",
                   width: `${esUsagePercentage}%`,
                 }}
               ></div>
