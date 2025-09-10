@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Crown, Star, Gift, Settings } from "lucide-react";
+import { Crown, Star, Gift, Settings, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 interface FreePlanWidgetProps {
@@ -104,12 +104,36 @@ export function FreePlanWidget({
               {remainingInterviews === 999 || remainingInterviews > 50 ? "∞" : remainingInterviews}
             </div>
             <div className="text-gray-600 text-xs">面接回数</div>
+            {remainingInterviews <= 0 && (
+              <Link href="/billing">
+                <Button 
+                  variant="default" 
+                  size="sm" 
+                  className="mt-2 bg-[#9fe870] text-[#163300] hover:bg-[#8fd960] rounded-full text-xs px-3 py-1 w-full"
+                >
+                  <span>もっと練習して、自信をつけよう！</span>
+                  <ArrowRight className="h-3 w-3 ml-1" />
+                </Button>
+              </Link>
+            )}
           </div>
           <div className="text-center">
             <div className="font-semibold text-base text-black">
               {remainingES === 999 || remainingES > 100 ? "∞" : remainingES}
             </div>
             <div className="text-gray-600 text-xs">ES添削回数</div>
+            {remainingES <= 0 && (
+              <Link href="/billing">
+                <Button 
+                  variant="default" 
+                  size="sm" 
+                  className="mt-2 bg-[#9fe870] text-[#163300] hover:bg-[#8fd960] rounded-full text-xs px-3 py-1 w-full"
+                >
+                  <span>もっと添削してもらおう！</span>
+                  <ArrowRight className="h-3 w-3 ml-1" />
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </CardContent>

@@ -1,7 +1,9 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { TrendingUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { TrendingUp, ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 interface UsageStatusWidgetProps {
   planName: string;
@@ -117,6 +119,20 @@ export function UsageStatusWidget({
                 }}
               ></div>
             </div>
+            {remainingInterviews <= 0 && (
+              <div className="mt-2">
+                <Link href="/billing">
+                  <Button 
+                    variant="default" 
+                    size="sm" 
+                    className="bg-[#9fe870] text-[#163300] hover:bg-[#8fd960] rounded-full text-xs px-3 py-1 w-full"
+                  >
+                    <span>もっと練習して、自信をつけよう！</span>
+                    <ArrowRight className="h-3 w-3 ml-1" />
+                  </Button>
+                </Link>
+              </div>
+            )}
           </div>
           <div>
             <div className="flex justify-between items-center mb-1">
@@ -134,6 +150,20 @@ export function UsageStatusWidget({
                 }}
               ></div>
             </div>
+            {remainingES <= 0 && (
+              <div className="mt-2">
+                <Link href="/billing">
+                  <Button 
+                    variant="default" 
+                    size="sm" 
+                    className="bg-[#9fe870] text-[#163300] hover:bg-[#8fd960] rounded-full text-xs px-3 py-1 w-full"
+                  >
+                    <span>もっと添削してもらおう！</span>
+                    <ArrowRight className="h-3 w-3 ml-1" />
+                  </Button>
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </CardContent>
