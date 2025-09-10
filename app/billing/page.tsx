@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import Head from "next/head";
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { CheckoutButton } from "@/components/payments/CheckoutButton";
 import { PLANS } from "@/lib/stripe/plans";
 import {
@@ -58,7 +57,7 @@ export default function BillingPage() {
         setSubscriptionInfo(info);
       } catch (error) {
         console.error("Failed to load subscription info:", error);
-        setError("サブスクリプション情報の読み込みに失敗しました");
+        setError("ログインしてからご利用できます！");
       } finally {
         setLoading(false);
       }
@@ -178,13 +177,13 @@ export default function BillingPage() {
       setSubscriptionInfo(info);
     } catch (error) {
       console.error("Failed to load subscription info:", error);
-      setError("サブスクリプション情報の読み込みに失敗しました");
+      setError("ログインしてからご利用できます！");
     } finally {
       setLoading(false);
     }
   };
   return (
-    <ProtectedRoute>
+    <>
       <Head>
         <title>料金プラン | プロイー - AI面接練習プラットフォーム</title>
         <meta
@@ -703,6 +702,6 @@ export default function BillingPage() {
           )}
         </div>
       </div>
-    </ProtectedRoute>
+    </>
   );
 }
