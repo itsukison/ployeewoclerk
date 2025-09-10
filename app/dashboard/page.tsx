@@ -53,11 +53,11 @@ const DashboardPage = () => {
 
           setUserInfo({
             planName,
-            remainingInterviews: sessionInfo.remainingInterviews,
+            remainingInterviews: sessionInfo?.remainingInterviews || 0,
             remainingES: Math.max(0, esLimit - esUsage),
             planLimitInterviews: interviewLimit,
             planLimitES: esLimit,
-            currentUsageInterviews: sessionInfo.currentUsage,
+            currentUsageInterviews: sessionInfo?.currentUsage || 0,
             currentUsageES: esUsage,
             isLoading: false,
           });

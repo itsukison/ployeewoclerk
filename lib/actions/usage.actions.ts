@@ -168,7 +168,7 @@ export async function getUserPlanLimit(): Promise<number> {
     if (!userId) return 1; // Return default for unauthenticated users
     
     const limits = await getEffectiveUserLimits();
-    return limits.interview_limit;
+    return limits?.interview_limit || 1;
   } catch (error) {
     console.error('Error getting user plan limit:', error);
     // Default to free plan on error
@@ -187,7 +187,7 @@ export async function getESPlanLimit(): Promise<number> {
     if (!userId) return 5; // Return default for unauthenticated users
     
     const limits = await getEffectiveUserLimits();
-    return limits.es_limit;
+    return limits?.es_limit || 5;
   } catch (error) {
     console.error('Error getting user ES plan limit:', error);
     // Default to free plan on error
