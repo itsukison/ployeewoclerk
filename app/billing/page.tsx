@@ -218,7 +218,7 @@ export default function BillingPage() {
             </div>
           )}
 
-          {subscriptionInfo?.trial?.isTrialing && (
+          {subscriptionInfo?.trial?.isTrialing && subscriptionInfo.trial.trialPlan === 'basic' && (
             <div className="mb-8 p-6 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 max-w-2xl mx-auto">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
@@ -241,8 +241,7 @@ export default function BillingPage() {
                     無料トライアル中
                   </h3>
                   <p className="text-sm text-blue-700">
-                    {subscriptionInfo.trial.trialPlan === 'basic' ? 'ベーシックプラン' : 'プレミアムプラン'}の
-                    {subscriptionInfo.trial.trialPlan === 'basic' ? '7日間' : '14日間'}無料トライアルを利用中です
+                    ベーシックプランの7日間無料トライアルを利用中です
                   </p>
                 </div>
               </div>
@@ -557,13 +556,6 @@ export default function BillingPage() {
                       </span>
                     </div>
                   )}
-                  {subscriptionInfo?.trial?.isTrialing && subscriptionInfo.trial.trialPlan === "premium" && (
-                    <div className="absolute top-4 right-4">
-                      <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                        トライアル中
-                      </span>
-                    </div>
-                  )}
                   <div className="text-center mb-6">
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">
                       プレミアムプラン
@@ -572,13 +564,6 @@ export default function BillingPage() {
                       ¥750
                     </div>
                     <p className="text-gray-500">月額</p>
-                    {subscriptionInfo?.plan !== "premium" && !subscriptionInfo?.trial?.isTrialing && (
-                      <div className="mt-2">
-                        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
-                          14日間無料トライアル
-                        </span>
-                      </div>
-                    )}
                   </div>
                   <ul className="space-y-3 mb-8 flex-grow">
                     <li className="flex items-center space-x-3">

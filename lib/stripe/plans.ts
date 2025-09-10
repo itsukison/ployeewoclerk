@@ -29,7 +29,7 @@ export const PLANS = {
     price: 750,
     currency: 'jpy',
     interval: 'month',
-    trialDays: 14,
+    trialDays: 0,
     features: {
       interviews: 30,
       esCorrections: 50,
