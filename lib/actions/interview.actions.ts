@@ -33,7 +33,7 @@ export const verifyAuth = async (): Promise<{ isAuthenticated: boolean; userId?:
 
 // Type definition based on the form schema
 type CreateInterview = {
-  name: string;
+  name?: string;
   education?: string;
   companyName: string;
   interviewFocus: "consulting" | "finance" | "manufacturing" | "trading" | "it" | "advertising" | "hr" | "infrastructure" | "real_estate";

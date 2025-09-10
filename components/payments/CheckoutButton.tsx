@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { createCheckoutSession } from '@/lib/stripe/utils'
 import { PlanId } from '@/lib/stripe/plans'
+import { useAuth } from '@/components/auth/AuthProvider'
+import { AuthModal } from '@/components/auth/AuthModal'
 
 interface CheckoutButtonProps {
   planId: PlanId
@@ -23,10 +25,20 @@ export function CheckoutButton({
 }: CheckoutButtonProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showAuthModal, setShowAuthModal] = useState(false)
+  const { user } = useAuth()
 
   const handleCheckout = async () => {
     setLoading(true)
     setError(null)
+
+    // ユーザーが認証されていない場合はログインモーダルを表示
+    if (!user) {
+      setError('ログインしてからご利用できます！')
+      setLoading(false)
+      setShowAuthModal(true)
+      return
+    }
 
     try {
       const { url } = await createCheckoutSession({
@@ -77,6 +89,18 @@ export function CheckoutButton({
           `${planName}を始める`
         )}
       </Button>
+
+      {/* ログインモーダル */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        initialMode="signin"
+        onSuccess={() => {
+          setShowAuthModal(false);
+          // ユーザーがログインしたら自動的にチェックアウトを再試行
+          handleCheckout();
+        }}
+      />
     </div>
   )
 }

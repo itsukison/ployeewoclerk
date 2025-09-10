@@ -2,11 +2,10 @@
 
 import React, { useEffect, useState } from "react";
 import Head from "next/head";
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { CheckoutButton } from "@/components/payments/CheckoutButton";
 import { PLANS } from "@/lib/stripe/plans";
 import {
-  getUserSubscriptionInfo,
+  getUserSubscriptionSummary,
   cancelSubscription,
 } from "@/lib/stripe/utils";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
@@ -54,11 +53,11 @@ export default function BillingPage() {
     // Load subscription info
     const loadSubscriptionInfoOnMount = async () => {
       try {
-        const info = await getUserSubscriptionInfo();
+        const info = await getUserSubscriptionSummary();
         setSubscriptionInfo(info);
       } catch (error) {
         console.error("Failed to load subscription info:", error);
-        setError("サブスクリプション情報の読み込みに失敗しました");
+        setError("ログインしてからご利用できます！");
       } finally {
         setLoading(false);
       }
@@ -174,17 +173,17 @@ export default function BillingPage() {
     try {
       setLoading(true);
       setError(null);
-      const info = await getUserSubscriptionInfo();
+      const info = await getUserSubscriptionSummary();
       setSubscriptionInfo(info);
     } catch (error) {
       console.error("Failed to load subscription info:", error);
-      setError("サブスクリプション情報の読み込みに失敗しました");
+      setError("ログインしてからご利用できます！");
     } finally {
       setLoading(false);
     }
   };
   return (
-    <ProtectedRoute>
+    <>
       <Head>
         <title>料金プラン | プロイー - AI面接練習プラットフォーム</title>
         <meta
@@ -419,13 +418,14 @@ export default function BillingPage() {
 
                 {/* Basic Plan */}
                 <div className="bg-white rounded-2xl p-8 border-2 border-[#9fe870] hover:border-[#8fd960] transition-all relative flex flex-col">
-                  {subscriptionInfo?.plan !== "basic" && !subscriptionInfo?.trial?.isTrialing && (
-                    <div className="absolute top-4 right-4">
-                      <span className="bg-[#9fe870] text-[#163300] px-3 py-1 rounded-full text-sm font-semibold">
-                        人気
-                      </span>
-                    </div>
-                  )}
+                  {subscriptionInfo?.plan !== "basic" &&
+                    !subscriptionInfo?.trial?.isTrialing && (
+                      <div className="absolute top-4 right-4">
+                        <span className="bg-[#9fe870] text-[#163300] px-3 py-1 rounded-full text-sm font-semibold">
+                          人気
+                        </span>
+                      </div>
+                    )}
                   {subscriptionInfo?.plan === "basic" && (
                     <div className="absolute top-4 right-4">
                       <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
@@ -433,13 +433,14 @@ export default function BillingPage() {
                       </span>
                     </div>
                   )}
-                  {subscriptionInfo?.trial?.isTrialing && subscriptionInfo.trial.trialPlan === "basic" && (
-                    <div className="absolute top-4 right-4">
-                      <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                        トライアル中
-                      </span>
-                    </div>
-                  )}
+                  {subscriptionInfo?.trial?.isTrialing &&
+                    subscriptionInfo.trial.trialPlan === "basic" && (
+                      <div className="absolute top-4 right-4">
+                        <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                          トライアル中
+                        </span>
+                      </div>
+                    )}
                   <div className="text-center mb-6">
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">
                       ベーシックプラン
@@ -448,13 +449,14 @@ export default function BillingPage() {
                       ¥300
                     </div>
                     <p className="text-gray-500">月額</p>
-                    {subscriptionInfo?.plan !== "basic" && !subscriptionInfo?.trial?.isTrialing && (
-                      <div className="mt-2">
-                        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
-                          7日間無料トライアル
-                        </span>
-                      </div>
-                    )}
+                    {subscriptionInfo?.plan !== "basic" &&
+                      !subscriptionInfo?.trial?.isTrialing && (
+                        <div className="mt-2">
+                          <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                            7日間無料トライアル
+                          </span>
+                        </div>
+                      )}
                   </div>
                   <ul className="space-y-3 mb-8 flex-grow">
                     <li className="flex items-center space-x-3">
@@ -688,6 +690,6 @@ export default function BillingPage() {
           )}
         </div>
       </div>
-    </ProtectedRoute>
+    </>
   );
 }

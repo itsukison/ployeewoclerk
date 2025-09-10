@@ -32,9 +32,7 @@ import { canStartSession } from "@/lib/actions/usage.actions";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 const formSchema = z.object({
-  name: z.string().min(1, {
-    message: "お名前を入力してください（ニックネーム可）",
-  }),
+  name: z.string().optional(),
 
   education: z.string().optional(),
 
@@ -282,11 +280,11 @@ export function InterviewForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-sm sm:text-base font-semibold text-[#163300]">
-                      お名前 <span className="text-red-500">*</span>
+                      名前・ニックネーム
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="例: 田中太郎"
+                        placeholder="例: 田中太郎（任意）"
                         className="h-10 sm:h-12 text-sm sm:text-base"
                         {...field}
                       />

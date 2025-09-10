@@ -3,13 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
-import {
-  canStartSession,
-  getCurrentESUsage,
-  getESPlanLimit,
-  getUserPlanName,
-  getUserPlanLimit,
-} from "@/lib/actions/usage.actions";
+import { getUsageSummary } from "@/lib/actions/usage.actions";
 import { MessageCircle, History, Edit, FileText } from "lucide-react";
 import { PlanAndUsageWidgets } from "@/components/ui/plan-and-usage-widgets";
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -42,23 +36,16 @@ const DashboardPage = () => {
     if (!loading && user) {
       const fetchUserInfo = async () => {
         try {
-          const [sessionInfo, planName, esUsage, esLimit, interviewLimit] =
-            await Promise.all([
-              canStartSession(),
-              getUserPlanName(),
-              getCurrentESUsage(),
-              getESPlanLimit(),
-              getUserPlanLimit(),
-            ]);
+          const summary = await getUsageSummary();
 
           setUserInfo({
-            planName,
-            remainingInterviews: sessionInfo?.remainingInterviews || 0,
-            remainingES: Math.max(0, esLimit - esUsage),
-            planLimitInterviews: interviewLimit,
-            planLimitES: esLimit,
-            currentUsageInterviews: sessionInfo?.currentUsage || 0,
-            currentUsageES: esUsage,
+            planName: summary.planName,
+            remainingInterviews: summary.remainingInterviews,
+            remainingES: summary.remainingES,
+            planLimitInterviews: summary.planLimitInterviews,
+            planLimitES: summary.planLimitES,
+            currentUsageInterviews: summary.currentUsageInterviews,
+            currentUsageES: summary.currentUsageES,
             isLoading: false,
           });
         } catch (error) {
@@ -327,12 +314,6 @@ const DashboardPage = () => {
                     className="text-sm text-gray-600 hover:text-[#163300] transition-colors duration-200"
                   >
                     プライバシーポリシー
-                  </a>
-                  <a
-                    href="/commercial-transactions"
-                    className="text-sm text-gray-600 hover:text-[#163300] transition-colors duration-200"
-                  >
-                    特定商取引法に基づく表記
                   </a>
                 </div>
               </div>
