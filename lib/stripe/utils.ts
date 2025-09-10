@@ -603,3 +603,53 @@ export async function getUserSubscriptionInfo(userId?: string) {
     throw error
   }
 }
+
+// Fast local summary for billing page initial render (no Stripe calls)
+export async function getUserSubscriptionSummary(userId?: string) {
+  try {
+    const { userId: currentUserId } = await auth()
+    const targetUserId = userId || currentUserId
+
+    if (!targetUserId) {
+      throw new Error('User not authenticated')
+    }
+
+    const profile = await getUserProfile(targetUserId)
+    if (!profile) {
+      throw new Error('User profile not found')
+    }
+
+    // Effective limits include plan_name and grandfathering flags
+    const effectiveLimits = await getEffectiveUserLimits(targetUserId)
+
+    const grandfathered = effectiveLimits?.is_grandfathered
+      ? {
+          isGrandfathered: true,
+          grandfatheredPlan: effectiveLimits.plan_name || '上位プラン',
+          expiresAt: effectiveLimits.expires_at ? new Date(effectiveLimits.expires_at) : null,
+          limits: {
+            interviews: effectiveLimits.interview_limit || 0,
+            esCorrections: effectiveLimits.es_limit || 0,
+          },
+        }
+      : null
+
+    return {
+      plan: profile.plan,
+      planName: PLANS[profile.plan as PlanId]?.name || 'Unknown Plan',
+      subscriptionStatus: profile.subscription_status,
+      subscription: null, // intentionally omit Stripe fetch for speed
+      stripeCustomerId: profile.stripe_customer_id,
+      grandfathered,
+      trial: {
+        isTrialing: profile.subscription_status === 'trialing',
+        trialStartDate: profile.trial_start_date,
+        trialEndDate: profile.trial_end_date,
+        trialPlan: profile.trial_plan,
+      },
+    }
+  } catch (error) {
+    console.error('getUserSubscriptionSummary error:', error)
+    throw error
+  }
+}

@@ -370,3 +370,90 @@ export async function canStartSession(): Promise<{
     };
   }
 }
+
+/**
+ * Aggregated usage + limits for faster dashboard rendering.
+ * - Single read of usage_tracking for current month (no write-on-read)
+ * - Single fetch of effective limits (includes grandfathered limits)
+ */
+export async function getUsageSummary(): Promise<{
+  planName: string;
+  planLimitInterviews: number;
+  planLimitES: number;
+  currentUsageInterviews: number;
+  currentUsageES: number;
+  remainingInterviews: number;
+  remainingES: number;
+}> {
+  try {
+    const { userId } = await auth();
+    // For unauthenticated callers, return safe defaults instantly
+    if (!userId) {
+      const freePlanName = 'フリープラン';
+      const planLimitInterviews = 1;
+      const planLimitES = 5;
+      const currentUsageInterviews = 0;
+      const currentUsageES = 0;
+      return {
+        planName: freePlanName,
+        planLimitInterviews,
+        planLimitES,
+        currentUsageInterviews,
+        currentUsageES,
+        remainingInterviews: planLimitInterviews - currentUsageInterviews,
+        remainingES: planLimitES - currentUsageES,
+      };
+    }
+
+    const supabase = await createClient();
+
+    // Read both usage counters in a single query; avoid write-on-read for speed
+    const { data: usageRow, error: usageError } = await supabase
+      .from('usage_tracking')
+      .select('minutes_used, es_corrections_used')
+      .eq('author', userId)
+      .eq('month_year', monthStart())
+      .single();
+
+    let currentUsageInterviews = 0;
+    let currentUsageES = 0;
+    if (!usageError) {
+      currentUsageInterviews = usageRow?.minutes_used ?? 0;
+      currentUsageES = usageRow?.es_corrections_used ?? 0;
+    } else if (usageError?.code !== 'PGRST116') {
+      // If it's not a "no rows" error, log and continue with 0s to avoid blocking UI
+      console.error('getUsageSummary: usage fetch error:', usageError);
+    }
+
+    // Fetch effective limits once (includes plan name and grandfathered logic)
+    const limits = await getEffectiveUserLimits();
+    const planLimitInterviews = limits?.interview_limit || 1;
+    const planLimitES = limits?.es_limit || 5;
+    const planName = limits?.plan_name || 'フリープラン';
+
+    const remainingInterviews = Math.max(0, planLimitInterviews - currentUsageInterviews);
+    const remainingES = Math.max(0, planLimitES - currentUsageES);
+
+    return {
+      planName,
+      planLimitInterviews,
+      planLimitES,
+      currentUsageInterviews,
+      currentUsageES,
+      remainingInterviews,
+      remainingES,
+    };
+  } catch (error) {
+    console.error('getUsageSummary error:', error);
+    // Return safe defaults on error to keep UI responsive
+    return {
+      planName: 'フリープラン',
+      planLimitInterviews: 1,
+      planLimitES: 5,
+      currentUsageInterviews: 0,
+      currentUsageES: 0,
+      remainingInterviews: 1,
+      remainingES: 5,
+    };
+  }
+}
