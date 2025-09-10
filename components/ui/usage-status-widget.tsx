@@ -145,7 +145,7 @@ export function UsageStatusWidget({
               <div
                 className="h-1.5 rounded-full transition-all duration-300"
                 style={{
-                  backgroundColor: "#9fe870",
+                  backgroundColor: "rgba(255,100,100,0.7)",
                   width: `${esUsagePercentage}%`,
                 }}
               ></div>
