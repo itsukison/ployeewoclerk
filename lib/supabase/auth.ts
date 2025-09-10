@@ -326,3 +326,34 @@ export async function updateUserSubscription(
     throw error
   }
 }
+
+// Admin function to update user subscription with trial information (used by webhooks)
+export async function updateUserSubscriptionWithTrial(
+  stripeCustomerId: string,
+  subscriptionId?: string,
+  status?: 'active' | 'inactive' | 'past_due' | 'canceled' | 'trialing',
+  planName?: string,
+  trialStartDate?: Date | null,
+  trialEndDate?: Date | null
+) {
+  try {
+    const { data, error } = await supabaseAdmin.rpc('update_user_subscription_with_trial', {
+      customer_id: stripeCustomerId,
+      subscription_id_param: subscriptionId,
+      status_param: status,
+      plan_name: planName,
+      trial_start_date: trialStartDate?.toISOString(),
+      trial_end_date: trialEndDate?.toISOString()
+    })
+
+    if (error) {
+      console.error('Subscription with trial update error:', error)
+      throw new Error(`Failed to update subscription with trial: ${error.message}`)
+    }
+
+    return data
+  } catch (error) {
+    console.error('updateUserSubscriptionWithTrial error:', error)
+    throw error
+  }
+}

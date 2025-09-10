@@ -73,6 +73,8 @@ export function CheckoutButton({
         ) : children ? (
           children
         ) : (
+          planId === 'basic' ? '7日間無料トライアルで始める' :
+          planId === 'premium' ? '14日間無料トライアルで始める' :
           `${planName}を始める`
         )}
       </Button>

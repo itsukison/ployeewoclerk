@@ -3,7 +3,7 @@
 import { stripe, STRIPE_CONFIG, SERVER_PLANS, PlanId } from './config'
 import { PLANS } from './plans'
 import Stripe from 'stripe'
-import { getUserProfile, updateUserProfile, updateUserSubscription, getEffectiveUserLimits } from '../supabase/auth'
+import { getUserProfile, updateUserProfile, updateUserSubscription, updateUserSubscriptionWithTrial, getEffectiveUserLimits } from '../supabase/auth'
 import { auth } from '../supabase/auth'
 import { supabaseAdmin } from '../supabase/client'
 
@@ -119,6 +119,9 @@ export async function createCheckoutSession({
       }
     }
 
+    // Add trial period for new subscriptions (not upgrades/downgrades)
+    let hasExistingSubscription = false
+
     try {
       const existingSubscriptions = await stripe.subscriptions.list({
         customer: customerId,
@@ -126,6 +129,7 @@ export async function createCheckoutSession({
       })
 
       if (existingSubscriptions.data.length > 0) {
+        hasExistingSubscription = true
         console.log(`Found ${existingSubscriptions.data.length} existing active subscription(s) for customer ${customerId}`)
         
         // Determine if this is an upgrade or downgrade
@@ -201,6 +205,13 @@ export async function createCheckoutSession({
     } catch (subscriptionError) {
       console.error('Error handling existing subscriptions:', subscriptionError)
       // Continue with checkout creation even if subscription cleanup fails
+    }
+
+    // Add trial period for new subscriptions (not upgrades/downgrades)
+    if (!hasExistingSubscription && plan.trialDays > 0) {
+      const trialEnd = Math.floor(Date.now() / 1000) + (plan.trialDays * 24 * 60 * 60)
+      sessionConfig.subscription_data.trial_end = trialEnd
+      console.log(`Adding ${plan.trialDays} day trial for plan ${planId}, trial ends at: ${new Date(trialEnd * 1000).toISOString()}`)
     }
 
     const session = await stripe.checkout.sessions.create(sessionConfig)
@@ -292,6 +303,8 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
     const customerId = (subscription as any).customer
     const subscriptionId = subscription.id
     const status = subscription.status
+    const trialStart = (subscription as any).trial_start
+    const trialEnd = (subscription as any).trial_end
     
     // Get price ID to determine plan
     const priceId = (subscription as any).items?.data?.[0]?.price?.id
@@ -302,6 +315,8 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
       subscriptionId,
       priceId,
       status,
+      trialStart,
+      trialEnd,
       expectedBasicPrice: STRIPE_CONFIG.prices.basic,
       expectedPremiumPrice: STRIPE_CONFIG.prices.premium
     })
@@ -329,11 +344,13 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
     console.log(`Final mapping: price ${priceId} → plan: ${planId}`)
 
     // Update user subscription via admin RPC to bypass RLS
-    const result = await updateUserSubscription(
+    const result = await updateUserSubscriptionWithTrial(
       customerId,
       subscriptionId,
       mapStripeStatusToLocal(status),
-      planId
+      planId,
+      trialStart ? new Date(trialStart * 1000) : null,
+      trialEnd ? new Date(trialEnd * 1000) : null
     )
 
     console.log(`Subscription update result:`, {
@@ -564,7 +581,13 @@ export async function getUserSubscriptionInfo(userId?: string) {
       subscriptionStatus: profile.subscription_status,
       subscription: subscriptionInfo,
       stripeCustomerId: profile.stripe_customer_id,
-      grandfathered: grandfatheredInfo
+      grandfathered: grandfatheredInfo,
+      trial: {
+        isTrialing: profile.subscription_status === 'trialing',
+        trialStartDate: profile.trial_start_date,
+        trialEndDate: profile.trial_end_date,
+        trialPlan: profile.trial_plan
+      }
     }
     
     console.log('✅ Subscription info compiled successfully:', {

@@ -24,6 +24,12 @@ interface SubscriptionInfo {
       esCorrections: number;
     };
   } | null;
+  trial?: {
+    isTrialing: boolean;
+    trialStartDate: Date | null;
+    trialEndDate: Date | null;
+    trialPlan: string | null;
+  };
 }
 
 export default function BillingPage() {
@@ -212,6 +218,49 @@ export default function BillingPage() {
             </div>
           )}
 
+          {subscriptionInfo?.trial?.isTrialing && (
+            <div className="mb-8 p-6 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 max-w-2xl mx-auto">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                  <svg
+                    className="w-5 h-5 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-blue-800">
+                    無料トライアル中
+                  </h3>
+                  <p className="text-sm text-blue-700">
+                    {subscriptionInfo.trial.trialPlan === 'basic' ? 'ベーシックプラン' : 'プレミアムプラン'}の
+                    {subscriptionInfo.trial.trialPlan === 'basic' ? '7日間' : '14日間'}無料トライアルを利用中です
+                  </p>
+                </div>
+              </div>
+              {subscriptionInfo.trial.trialEndDate && (
+                <div className="text-sm text-blue-700">
+                  <div className="flex justify-between pt-2 border-t border-blue-200">
+                    <span>トライアル終了予定:</span>
+                    <span className="font-semibold">
+                      {subscriptionInfo.trial.trialEndDate.toLocaleDateString(
+                        "ja-JP"
+                      )}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {subscriptionInfo?.grandfathered?.isGrandfathered &&
             subscriptionInfo.grandfathered.limits && (
               <div className="mb-8 p-6 rounded-2xl bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 max-w-2xl mx-auto">
@@ -371,7 +420,7 @@ export default function BillingPage() {
 
                 {/* Basic Plan */}
                 <div className="bg-white rounded-2xl p-8 border-2 border-[#9fe870] hover:border-[#8fd960] transition-all relative flex flex-col">
-                  {subscriptionInfo?.plan !== "basic" && (
+                  {subscriptionInfo?.plan !== "basic" && !subscriptionInfo?.trial?.isTrialing && (
                     <div className="absolute top-4 right-4">
                       <span className="bg-[#9fe870] text-[#163300] px-3 py-1 rounded-full text-sm font-semibold">
                         人気
@@ -385,6 +434,13 @@ export default function BillingPage() {
                       </span>
                     </div>
                   )}
+                  {subscriptionInfo?.trial?.isTrialing && subscriptionInfo.trial.trialPlan === "basic" && (
+                    <div className="absolute top-4 right-4">
+                      <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                        トライアル中
+                      </span>
+                    </div>
+                  )}
                   <div className="text-center mb-6">
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">
                       ベーシックプラン
@@ -393,6 +449,13 @@ export default function BillingPage() {
                       ¥300
                     </div>
                     <p className="text-gray-500">月額</p>
+                    {subscriptionInfo?.plan !== "basic" && !subscriptionInfo?.trial?.isTrialing && (
+                      <div className="mt-2">
+                        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                          7日間無料トライアル
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <ul className="space-y-3 mb-8 flex-grow">
                     <li className="flex items-center space-x-3">
@@ -494,6 +557,13 @@ export default function BillingPage() {
                       </span>
                     </div>
                   )}
+                  {subscriptionInfo?.trial?.isTrialing && subscriptionInfo.trial.trialPlan === "premium" && (
+                    <div className="absolute top-4 right-4">
+                      <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                        トライアル中
+                      </span>
+                    </div>
+                  )}
                   <div className="text-center mb-6">
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">
                       プレミアムプラン
@@ -502,6 +572,13 @@ export default function BillingPage() {
                       ¥750
                     </div>
                     <p className="text-gray-500">月額</p>
+                    {subscriptionInfo?.plan !== "premium" && !subscriptionInfo?.trial?.isTrialing && (
+                      <div className="mt-2">
+                        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                          14日間無料トライアル
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <ul className="space-y-3 mb-8 flex-grow">
                     <li className="flex items-center space-x-3">

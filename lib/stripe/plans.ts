@@ -5,6 +5,7 @@ export const PLANS = {
     price: 0,
     currency: 'jpy',
     interval: null,
+    trialDays: 0,
     features: {
       interviews: 1,
       esCorrections: 5,
@@ -16,6 +17,7 @@ export const PLANS = {
     price: 300,
     currency: 'jpy',
     interval: 'month',
+    trialDays: 7,
     features: {
       interviews: 10,
       esCorrections: 20,
@@ -27,6 +29,7 @@ export const PLANS = {
     price: 750,
     currency: 'jpy',
     interval: 'month',
+    trialDays: 14,
     features: {
       interviews: 30,
       esCorrections: 50,
