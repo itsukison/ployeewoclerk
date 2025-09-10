@@ -284,7 +284,7 @@ export function InterviewForm() {
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="例: 田中太郎"
+                        placeholder="例: 田中太郎（任意）"
                         className="h-10 sm:h-12 text-sm sm:text-base"
                         {...field}
                       />

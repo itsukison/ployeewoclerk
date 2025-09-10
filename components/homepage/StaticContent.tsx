@@ -832,12 +832,6 @@ export default function StaticContent() {
                   >
                     プライバシーポリシー
                   </a>
-                  <a
-                    href="/commercial-transactions"
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    特定商取引法に基づく表記
-                  </a>
                   <p className="text-gray-400">
                     © 2025 プロイー. All rights reserved.
                   </p>
