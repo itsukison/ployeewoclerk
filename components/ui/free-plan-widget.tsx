@@ -109,7 +109,7 @@ export function FreePlanWidget({
                 <Button 
                   variant="default" 
                   size="sm" 
-                  className="mt-2 bg-[rgba(159,232,112,0.7)] text-[#163300] backdrop-blur-sm border border-[rgba(255,255,255,0.3)] shadow-sm hover:bg-[rgba(255,100,100,0.2)] hover:text-red-700 hover:shadow-[0_0_10px_rgba(255,0,0,0.3)] transition-all duration-300 rounded-full text-xs px-3 py-1 w-full"
+                  className="bg-[rgba(255,100,100,0.7)] text-white backdrop-blur-sm border border-[rgba(255,255,255,0.3)] shadow-sm hover:bg-[rgba(255,100,100,0.9)] hover:shadow-[0_0_10px_rgba(255,0,0,0.5)] transition-all duration-300 rounded-full text-xs px-3 py-1 w-full"
                 >
                   <span>もっと練習しよう！</span>
                   <ArrowRight className="h-3 w-3 ml-1" />
@@ -127,8 +127,8 @@ export function FreePlanWidget({
                 <Button 
                   variant="default" 
                   size="sm" 
-                  className="mt-2 bg-[rgba(159,232,112,0.7)] text-[#163300] backdrop-blur-sm border border-[rgba(255,255,255,0.3)] shadow-sm hover:bg-[rgba(255,100,100,0.2)] hover:text-red-700 hover:shadow-[0_0_10px_rgba(255,0,0,0.3)] transition-all duration-300 rounded-full text-xs px-3 py-1 w-full"
-                >
+                  className="bg-[rgba(255,100,100,0.7)] text-white backdrop-blur-sm border border-[rgba(255,255,255,0.3)] shadow-sm hover:bg-[rgba(255,100,100,0.9)] hover:shadow-[0_0_10px_rgba(255,0,0,0.5)] transition-all duration-300 rounded-full text-xs px-3 py-1 w-full"
+                  >
                   <span>もっと添削してもらおう！</span>
                   <ArrowRight className="h-3 w-3 ml-1" />
                 </Button>
