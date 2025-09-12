@@ -218,11 +218,11 @@ export default function BillingPage() {
           )}
 
           {subscriptionInfo?.trial?.isTrialing && subscriptionInfo.trial.trialPlan === 'basic' && (
-            <div className="mb-8 p-6 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 max-w-2xl mx-auto">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+            <div className="mb-8 p-6 rounded-2xl bg-gradient-to-r from-yellow-400 to-orange-500 border border-yellow-500 shadow-lg max-w-2xl mx-auto transform transition-all duration-300 hover:shadow-xl hover:scale-[1.02]">
+              <div className="flex items-center gap-4 mb-3">
+                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md">
                   <svg
-                    className="w-5 h-5 text-white"
+                    className="w-6 h-6 text-orange-500"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -236,10 +236,10 @@ export default function BillingPage() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-blue-800">
+                  <h3 className="text-lg font-semibold text-blue-700">
                     無料トライアル中
                   </h3>
-                  <p className="text-sm text-blue-700">
+                  <p className="text-sm text-blue-600">
                     ベーシックプランの7日間無料トライアルを利用中です
                   </p>
                 </div>
@@ -452,7 +452,7 @@ export default function BillingPage() {
                     {subscriptionInfo?.plan !== "basic" &&
                       !subscriptionInfo?.trial?.isTrialing && (
                         <div className="mt-2">
-                          <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                          <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1.5 rounded-full text-sm font-bold shadow-md transform transition-all duration-300 hover:shadow-lg hover:scale-105">
                             7日間無料トライアル
                           </span>
                         </div>

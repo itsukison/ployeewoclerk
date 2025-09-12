@@ -720,6 +720,15 @@ export function useInterviewSession(interviewId?: string) {
     try {
       setIsPlayingTTS(true);
       
+      // Mute the user's microphone during self-introduction
+      if (interviewPhase === "self_intro" && streamRef.current) {
+        const audioTracks = streamRef.current.getAudioTracks();
+        audioTracks.forEach(track => {
+          track.enabled = false; // Mute the microphone
+        });
+        setIsMuted(true);
+      }
+      
       // Call the TTS API endpoint
       const response = await fetch("/api/generate-intro-tts", {
         method: "POST",
@@ -748,6 +757,16 @@ export function useInterviewSession(interviewId?: string) {
           console.log("Intro TTS playback ended, starting new recording session");
           currentAudioRef.current = null;
           setIsPlayingTTS(false);
+          
+          // Unmute the user's microphone after self-introduction is done
+          if (interviewPhase === "self_intro" && streamRef.current) {
+            const audioTracks = streamRef.current.getAudioTracks();
+            audioTracks.forEach(track => {
+              track.enabled = true; // Unmute the microphone
+            });
+            setIsMuted(false);
+          }
+          
           startNewRecordingSession();
         };
 
@@ -755,6 +774,16 @@ export function useInterviewSession(interviewId?: string) {
           console.error("Intro audio playback error:", e);
           currentAudioRef.current = null;
           setIsPlayingTTS(false);
+          
+          // Unmute the user's microphone if there was an error
+          if (interviewPhase === "self_intro" && streamRef.current) {
+            const audioTracks = streamRef.current.getAudioTracks();
+            audioTracks.forEach(track => {
+              track.enabled = true; // Unmute the microphone
+            });
+            setIsMuted(false);
+          }
+          
           // Fallback to browser speech synthesis
           useBrowserTTS(message);
         };
@@ -767,10 +796,20 @@ export function useInterviewSession(interviewId?: string) {
       }
     } catch (error) {
       console.error("Error generating intro TTS:", error);
+      
+      // Unmute the user's microphone if there was an error
+      if (interviewPhase === "self_intro" && streamRef.current) {
+        const audioTracks = streamRef.current.getAudioTracks();
+        audioTracks.forEach(track => {
+          track.enabled = true; // Unmute the microphone
+        });
+        setIsMuted(false);
+      }
+      
       // Fallback to browser speech synthesis
       useBrowserTTS(message);
     }
-  }, []);
+  }, [interviewPhase, startNewRecordingSession]);
 
   // Browser TTS fallback function
   const useBrowserTTS = useCallback((message: string) => {
@@ -780,19 +819,49 @@ export function useInterviewSession(interviewId?: string) {
       utterance.rate = 0.9;
       utterance.onend = () => {
         setIsPlayingTTS(false);
+        
+        // Unmute the user's microphone after self-introduction is done
+        if (interviewPhase === "self_intro" && streamRef.current) {
+          const audioTracks = streamRef.current.getAudioTracks();
+          audioTracks.forEach(track => {
+            track.enabled = true; // Unmute the microphone
+          });
+          setIsMuted(false);
+        }
+        
         startNewRecordingSession();
       };
       utterance.onerror = () => {
         setIsPlayingTTS(false);
+        
+        // Unmute the user's microphone if there was an error
+        if (interviewPhase === "self_intro" && streamRef.current) {
+          const audioTracks = streamRef.current.getAudioTracks();
+          audioTracks.forEach(track => {
+            track.enabled = true; // Unmute the microphone
+          });
+          setIsMuted(false);
+        }
+        
         startNewRecordingSession();
       };
       speechSynthesis.speak(utterance);
     } else {
       // No TTS available, just start recording
       setIsPlayingTTS(false);
+      
+      // Unmute the user's microphone if no TTS is available
+      if (interviewPhase === "self_intro" && streamRef.current) {
+        const audioTracks = streamRef.current.getAudioTracks();
+        audioTracks.forEach(track => {
+          track.enabled = true; // Unmute the microphone
+        });
+        setIsMuted(false);
+      }
+      
       startNewRecordingSession();
     }
-  }, []);
+  }, [interviewPhase, startNewRecordingSession]);
 
   return {
     // State
@@ -823,4 +892,4 @@ export function useInterviewSession(interviewId?: string) {
     // Constants
     SILENCE_DURATION,
   };
-} 
+}

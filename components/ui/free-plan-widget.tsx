@@ -92,9 +92,13 @@ export function FreePlanWidget({
             </div>
           </div>
           <Link href="/billing">
-            <Button variant="outline" size="sm" className="rounded-full px-2 py-1 text-xs">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className={`rounded-full px-2 py-1 text-xs ${(remainingInterviews <= 0 || remainingES <= 0) ? 'bg-[rgba(200,0,0,0.85)] text-white hover:bg-[rgba(180,0,0,0.95)]' : 'bg-orange-500 text-white hover:bg-orange-600'}`}
+            >
               <Settings className="h-3 w-3 mr-1" />
-              管理
+              アップグレード
             </Button>
           </Link>
         </div>
@@ -104,36 +108,14 @@ export function FreePlanWidget({
               {remainingInterviews === 999 || remainingInterviews > 50 ? "∞" : remainingInterviews}
             </div>
             <div className="text-gray-600 text-xs">面接回数</div>
-            {remainingInterviews <= 0 && (
-              <Link href="/billing">
-                <Button 
-                  variant="default" 
-                  size="sm" 
-                  className="bg-[rgba(255,100,100,0.7)] text-white backdrop-blur-sm border border-[rgba(255,255,255,0.3)] shadow-sm hover:bg-[rgba(255,100,100,0.9)] hover:shadow-[0_0_10px_rgba(255,0,0,0.5)] transition-all duration-300 rounded-full text-xs px-3 py-1 w-full"
-                >
-                  <span>もっと練習しよう！</span>
-                  <ArrowRight className="h-3 w-3 ml-1" />
-                </Button>
-              </Link>
-            )}
+
           </div>
           <div className="text-center">
             <div className="font-semibold text-base text-black">
               {remainingES === 999 || remainingES > 100 ? "∞" : remainingES}
             </div>
             <div className="text-gray-600 text-xs">ES添削回数</div>
-            {remainingES <= 0 && (
-              <Link href="/billing">
-                <Button 
-                  variant="default" 
-                  size="sm" 
-                  className="bg-[rgba(255,100,100,0.7)] text-white backdrop-blur-sm border border-[rgba(255,255,255,0.3)] shadow-sm hover:bg-[rgba(255,100,100,0.9)] hover:shadow-[0_0_10px_rgba(255,0,0,0.5)] transition-all duration-300 rounded-full text-xs px-3 py-1 w-full"
-                  >
-                  <span>もっと添削してもらおう！</span>
-                  <ArrowRight className="h-3 w-3 ml-1" />
-                </Button>
-              </Link>
-            )}
+
           </div>
         </div>
       </CardContent>
